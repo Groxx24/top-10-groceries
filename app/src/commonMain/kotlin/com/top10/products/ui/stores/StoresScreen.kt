@@ -83,35 +83,46 @@ fun StoresScreen(
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
             )
             HorizontalDivider()
-            Box(Modifier.weight(1f)) {
-                when {
-                    state.loadFailed -> Message(
-                        title = stringResource(Res.string.stores_error_title),
-                        hint = stringResource(Res.string.error_hint),
-                    ) {
-                        Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-                    }
+            StoreList(state, onRetry, onOpenStore, Modifier.weight(1f))
+        }
+    }
+}
 
-                    state.isLoading -> Message(title = stringResource(Res.string.loading)) {
-                        CircularProgressIndicator()
-                    }
+/** The stores with their loading and error states; the debug screen shows it too. */
+@Composable
+fun StoreList(
+    state: StoresUiState,
+    onRetry: () -> Unit,
+    onOpenStore: (storeId: String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(modifier) {
+        when {
+            state.loadFailed -> Message(
+                title = stringResource(Res.string.stores_error_title),
+                hint = stringResource(Res.string.error_hint),
+            ) {
+                Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
+            }
 
-                    else -> LazyColumn(
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        item {
-                            Text(
-                                text = stringResource(Res.string.stores_section),
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(start = 4.dp, bottom = 2.dp),
-                            )
-                        }
-                        items(state.stores, key = { it.id }) { store ->
-                            StoreCard(store = store, onClick = { onOpenStore(store.id) })
-                        }
-                    }
+            state.isLoading -> Message(title = stringResource(Res.string.loading)) {
+                CircularProgressIndicator()
+            }
+
+            else -> LazyColumn(
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+            ) {
+                item {
+                    Text(
+                        text = stringResource(Res.string.stores_section),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 2.dp),
+                    )
+                }
+                items(state.stores, key = { it.id }) { store ->
+                    StoreCard(store = store, onClick = { onOpenStore(store.id) })
                 }
             }
         }

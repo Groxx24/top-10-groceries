@@ -14,7 +14,7 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.top10.products.di.AppContainer
-import com.top10.products.ui.debug.DebugScreen
+import com.top10.products.ui.debug.DebugRoute
 import com.top10.products.ui.stores.StoresRoute
 import com.top10.products.ui.top.TopOffersRoute
 
@@ -33,7 +33,8 @@ fun App(container: AppContainer, isDebugBuild: Boolean) {
                 state = rememberNavigationEventState(NavigationEventInfo.None),
                 onBackCompleted = { debugOpen = false },
             )
-            DebugScreen(onBack = { debugOpen = false })
+            // Picking a store does nothing yet; submitting its 10 products comes next.
+            DebugRoute(container, onBack = { debugOpen = false }, onPickStore = {})
         } else if (storeId == null) {
             StoresRoute(
                 container,
