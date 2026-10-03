@@ -5,14 +5,33 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import com.top10.groceries.di.AppContainer
+import com.top10.groceries.ui.stores.StoresRoute
 import com.top10.groceries.ui.top.TopOffersRoute
 
+/** Two screens: the store list, and the top list of the store picked there. */
 @Composable
 fun App(container: AppContainer) {
     MaterialTheme(colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors) {
-        TopOffersRoute(container)
+        var openStoreId by rememberSaveable { mutableStateOf<String?>(null) }
+        val storeId = openStoreId
+        if (storeId == null) {
+            StoresRoute(container, onOpenStore = { openStoreId = it })
+        } else {
+            NavigationBackHandler(
+                state = rememberNavigationEventState(NavigationEventInfo.None),
+                onBackCompleted = { openStoreId = null },
+            )
+            TopOffersRoute(container, storeId, onBack = { openStoreId = null })
+        }
     }
 }
 

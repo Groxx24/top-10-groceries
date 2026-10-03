@@ -24,31 +24,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.top10.groceries.domain.model.Offer
-import com.top10.groceries.domain.model.RankedOffer
 import com.top10.groceries.domain.model.saving
 import com.top10.groceries.resources.Res
 import com.top10.groceries.resources.deal_buy_quantity
 import com.top10.groceries.resources.deal_loyalty_card
 import com.top10.groceries.resources.deal_percent_off
 import com.top10.groceries.resources.deal_price_each
-import com.top10.groceries.resources.deal_same_deal_count
 import com.top10.groceries.resources.deal_saving
 import com.top10.groceries.resources.deal_valid_until
-import com.top10.groceries.resources.score_label
-import org.jetbrains.compose.resources.pluralStringResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 @Composable
-fun OfferCard(ranked: RankedOffer, onOpenProduct: (String) -> Unit) {
-    val offer = ranked.offer
+fun OfferCard(offer: Offer, onOpenProduct: (String) -> Unit) {
     val content: @Composable () -> Unit = {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                RankBadge(ranked.rank)
+                RankBadge(offer.rank)
                 ProductImage(offer.imageUrl)
                 Column(Modifier.weight(1f)) {
                     offer.brand?.let {
@@ -67,7 +62,7 @@ fun OfferCard(ranked: RankedOffer, onOpenProduct: (String) -> Unit) {
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        text = listOfNotNull(offer.categoryLabel.ifBlank { null }, offer.packageSize)
+                        text = listOfNotNull(offer.category, offer.packageSize)
                             .joinToString(" · "),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -75,10 +70,9 @@ fun OfferCard(ranked: RankedOffer, onOpenProduct: (String) -> Unit) {
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                Score(ranked.score.value)
             }
             DealSummary(offer)
-            DealDetails(ranked)
+            DealDetails(offer)
         }
     }
     val url = offer.productUrl
@@ -119,23 +113,6 @@ private fun ProductImage(url: String?) {
     )
 }
 
-@Composable
-private fun Score(value: Double) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-            text = value.roundToInt().toString(),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Text(
-            text = stringResource(Res.string.score_label),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
-
 /** The store's own label, then what it comes down to: "1+1 gratis  50% off when you buy 2". */
 @Composable
 private fun DealSummary(offer: Offer) {
@@ -167,8 +144,7 @@ private fun DealSummary(offer: Offer) {
 }
 
 @Composable
-private fun DealDetails(ranked: RankedOffer) {
-    val offer = ranked.offer
+private fun DealDetails(offer: Offer) {
     val lines = listOfNotNull(
         listOf(
             stringResource(Res.string.deal_price_each, formatEuros(offer.price)),
@@ -178,11 +154,6 @@ private fun DealDetails(ranked: RankedOffer) {
             offer.deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
             if (offer.deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
         ).joinToString(" · ").ifEmpty { null },
-        if (ranked.sameDealCount > 0) {
-            pluralStringResource(Res.plurals.deal_same_deal_count, ranked.sameDealCount, ranked.sameDealCount)
-        } else {
-            null
-        },
     )
     Column {
         lines.forEach {

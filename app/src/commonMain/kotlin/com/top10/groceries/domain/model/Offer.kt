@@ -1,30 +1,28 @@
 package com.top10.groceries.domain.model
 
-/** A product on promotion this week, with its deal already reduced to plain numbers. */
+/**
+ * One place in a store's top list, as it is published. The list is ranked before it reaches
+ * the app, so nothing here is computed on the device.
+ */
 data class Offer(
-    val store: Store,
-    val productCode: String,
+    /** 1 for the best offer of the week. */
+    val rank: Int,
+    val productId: String,
     val brand: String?,
     val name: String,
-    val category: ProductCategory,
-    /** The store's own name for the category, in the language the offers were fetched in. */
-    val categoryLabel: String,
-    /** Normal shelf price of one item, before the deal. */
-    val price: Double,
-    /** Pack size as the store prints it ("500 gr", "6 x 25 cl"), if known. */
+    /** The aisle as the store names it ("Meat", "Fruit & vegetables"). */
+    val category: String?,
+    /** Pack size as the store prints it ("500 g", "6 x 25 cl"), if known. */
     val packageSize: String?,
     val imageUrl: String?,
     val productUrl: String?,
+    /** Normal shelf price of one item, before the deal. */
+    val price: Double,
     val deal: Deal,
 )
 
-/**
- * What a promotion is worth. Every promotion type the store runs ("1+1 free", "2nd at -50%",
- * "3 for €5", "-€2") becomes the same two numbers, so offers can be compared with each other.
- */
+/** What a promotion is worth. Every store's wording ("1+1 free", "-30%") comes with the same numbers. */
 data class Deal(
-    /** Id of the promotion. Many products often share one ("1+1 on all Delhaize charcuterie"). */
-    val promotionId: String,
     /** The store's wording, shown to the user as is. */
     val label: String,
     /** Share of the normal price saved when buying [requiredQuantity] items, from 0 to 1. */
@@ -44,3 +42,10 @@ data class Deal(
 
 /** Money saved by taking the deal once, in euros. */
 val Offer.saving: Double get() = price * deal.requiredQuantity * deal.discount
+
+/** A store's top list for the week. */
+data class TopOffers(
+    val store: Store,
+    /** Best first. */
+    val offers: List<Offer>,
+)

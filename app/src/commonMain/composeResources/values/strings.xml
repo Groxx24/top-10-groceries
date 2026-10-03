@@ -1,16 +1,18 @@
 <resources>
-    <string name="top_title">Top 10 at %1$s</string>
-    <string name="top_subtitle">Best of %1$d products on promotion this week</string>
-    <string name="refresh">Refresh</string>
+    <string name="stores_title">Top 10 Groceries</string>
+    <string name="stores_hint">Pick a store to see this week’s ten best offers.</string>
+    <string name="stores_error_title">Could not load the stores</string>
 
-    <string name="loading_title">Reading this week’s promotions at %1$s…</string>
-    <string name="loading_hint">The store answers slowly. This can take a minute.</string>
+    <string name="top_title">Top 10 at %1$s</string>
+    <string name="top_title_loading">Top 10</string>
+    <string name="back">Back</string>
+
+    <string name="loading">Loading…</string>
     <string name="error_title">Could not load the offers</string>
     <string name="error_hint">Check the connection and try again.</string>
-    <string name="error_refresh">Could not refresh. Showing the last list.</string>
     <string name="retry">Try again</string>
-    <string name="empty_title">Nothing worth it this week</string>
-    <string name="empty_hint">No promotion at %1$s is deep enough to make the list.</string>
+    <string name="empty_title">Nothing this week</string>
+    <string name="empty_hint">%1$s has no top list for this week yet.</string>
 
     <string name="deal_percent_off">%1$d% off</string>
     <string name="deal_buy_quantity">when you buy %1$d</string>
@@ -18,12 +20,4 @@
     <string name="deal_saving">save €%1$s</string>
     <string name="deal_valid_until">Until %1$s</string>
     <string name="deal_loyalty_card">Loyalty card needed</string>
-    <plurals name="deal_same_deal_count">
-        <item quantity="one">Same deal on %1$d more product</item>
-        <item quantity="other">Same deal on %1$d more products</item>
-    </plurals>
-    <string name="score_label">score</string>
-
-    <string name="how_title">How the list is made</string>
-    <string name="how_body">Each promotion is turned into the real discount you get for the number of items you have to buy. Under 15% scores nothing, 20% scores very little and half price scores full marks. That is multiplied by how much the aisle matters for a weekly shop: meat, fish, bread, fruit and vegetables count most, drinks and sweets about half, alcohol, baby and pet products least. Having to buy several items costs a little, and saving more euros earns a little. A promotion covering many products takes one place, and no aisle takes more than three.</string>
 </resources>
