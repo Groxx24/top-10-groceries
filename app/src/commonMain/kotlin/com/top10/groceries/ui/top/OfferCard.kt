@@ -149,25 +149,19 @@ private fun DealSummary(offer: Offer) {
 
 @Composable
 private fun DealDetails(offer: Offer) {
-    val lines = listOfNotNull(
-        listOf(
-            stringResource(Res.string.deal_price_each, formatEuros(offer.price)),
-            stringResource(Res.string.deal_saving, formatEuros(offer.saving)),
-        ).joinToString(" · "),
-        listOfNotNull(
-            offer.deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
-            if (offer.deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
-        ).joinToString(" · ").ifEmpty { null },
+    val details = listOfNotNull(
+        stringResource(Res.string.deal_price_each, formatEuros(offer.price)),
+        stringResource(Res.string.deal_saving, formatEuros(offer.saving)),
+        offer.deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
+        if (offer.deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
     )
-    Column {
-        lines.forEach {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
+    Text(
+        text = details.joinToString(" · "),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+    )
 }
 
 /** 5.853 becomes "5.85". Common code has no number formatter. */
