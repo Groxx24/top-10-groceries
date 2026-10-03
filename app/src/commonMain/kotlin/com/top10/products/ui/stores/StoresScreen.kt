@@ -1,24 +1,32 @@
 package com.top10.products.ui.stores
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -28,9 +36,12 @@ import com.top10.products.resources.Res
 import com.top10.products.resources.error_hint
 import com.top10.products.resources.loading
 import com.top10.products.resources.retry
+import com.top10.products.resources.stores_card_hint
 import com.top10.products.resources.stores_error_title
 import com.top10.products.resources.stores_hint
+import com.top10.products.resources.stores_section
 import com.top10.products.resources.stores_title
+import com.top10.products.ui.BackArrow
 import com.top10.products.ui.Message
 import org.jetbrains.compose.resources.stringResource
 
@@ -41,42 +52,44 @@ fun StoresRoute(container: AppContainer, onOpenStore: (storeId: String) -> Unit)
     StoresScreen(state = state, onRetry = viewModel::onRetry, onOpenStore = onOpenStore)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoresScreen(
     state: StoresUiState,
     onRetry: () -> Unit,
     onOpenStore: (storeId: String) -> Unit,
 ) {
-    Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(Res.string.stores_title)) }) },
-    ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
-            when {
-                state.loadFailed -> Message(
-                    title = stringResource(Res.string.stores_error_title),
-                    hint = stringResource(Res.string.error_hint),
-                ) {
-                    Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-                }
-
-                state.isLoading -> Message(title = stringResource(Res.string.loading)) {
-                    CircularProgressIndicator()
-                }
-
-                else -> LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    item {
-                        Text(
-                            text = stringResource(Res.string.stores_hint),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+    Scaffold { padding ->
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            Header(Modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp))
+            HorizontalDivider()
+            Box(Modifier.weight(1f)) {
+                when {
+                    state.loadFailed -> Message(
+                        title = stringResource(Res.string.stores_error_title),
+                        hint = stringResource(Res.string.error_hint),
+                    ) {
+                        Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
                     }
-                    items(state.stores, key = { it.id }) { store ->
-                        StoreCard(store = store, onClick = { onOpenStore(store.id) })
+
+                    state.isLoading -> Message(title = stringResource(Res.string.loading)) {
+                        CircularProgressIndicator()
+                    }
+
+                    else -> LazyColumn(
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                    ) {
+                        item {
+                            Text(
+                                text = stringResource(Res.string.stores_section),
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.padding(start = 4.dp, bottom = 2.dp),
+                            )
+                        }
+                        items(state.stores, key = { it.id }) { store ->
+                            StoreCard(store = store, onClick = { onOpenStore(store.id) })
+                        }
                     }
                 }
             }
@@ -84,13 +97,63 @@ fun StoresScreen(
     }
 }
 
+/** The app's name and what it does, above the list. */
+@Composable
+private fun Header(modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            text = stringResource(Res.string.stores_title),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Text(
+            text = stringResource(Res.string.stores_hint),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
 @Composable
 private fun StoreCard(store: Store, onClick: () -> Unit) {
-    Card(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = store.name,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 20.dp),
-        )
+    ElevatedCard(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = store.name.take(1).uppercase(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+            Column(Modifier.weight(1f)) {
+                Text(
+                    text = store.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+                Text(
+                    text = stringResource(Res.string.stores_card_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            // The back arrow turned around, so the app needs no icons library for a forward arrow.
+            Icon(
+                imageVector = BackArrow,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp).rotate(180f),
+            )
+        }
     }
 }

@@ -39,19 +39,25 @@ fun App(container: AppContainer) {
 private val LightColors = lightColorScheme(
     primary = Color(0xFF2E6B3A),
     onPrimary = Color.White,
+    primaryContainer = Color(0xFFC8EBCB),
+    onPrimaryContainer = Color(0xFF0A3816),
     tertiaryContainer = Color(0xFFFFDDB8),
     onTertiaryContainer = Color(0xFF5A3200),
     background = Color(0xFFF7FAF4),
     surface = Color(0xFFF7FAF4),
+    surfaceContainerLow = Color.White,
     surfaceContainerHighest = Color(0xFFE5EBE1),
 )
 
 private val DarkColors = darkColorScheme(
     primary = Color(0xFF96D69E),
     onPrimary = Color(0xFF003912),
+    primaryContainer = Color(0xFF1F4F2A),
+    onPrimaryContainer = Color(0xFFC8EBCB),
     tertiaryContainer = Color(0xFF6B4200),
     onTertiaryContainer = Color(0xFFFFDDB8),
     background = Color(0xFF111411),
     surface = Color(0xFF111411),
+    surfaceContainerLow = Color(0xFF1B201B),
     surfaceContainerHighest = Color(0xFF2A302A),
 )
