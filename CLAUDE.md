@@ -34,6 +34,9 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is false the button is not shown and
   none of these screens can be reached. Even in a debug build they open only after
   `UnlockScreen` gets the passphrase, asked again each time the debug screens are opened.
+- ViewModels are kept for the whole session (keyed by store id), so a screen whose data can
+  change in between asks again each time it opens: `TopOffersRoute` calls
+  `TopOffersViewModel.onOpened()` from a `LaunchedEffect` instead of loading once in `init`.
 - Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag,
   whether the debug screens are unlocked, and the store being picked for. Back goes one screen
   up; leaving the debug screens locks them again.
@@ -78,9 +81,9 @@ prints both); English is always translated. Submitting publishes all three.
   offers in `top-lists.db` (`top_offers`, plus `top_lists` with when each was fetched and when it
   ends). A cached list is used until the first of its deals has ended: its `validUntil` ("07/10",
   read by `data/local/DueDate.kt` in Brussels time, through that day). The next open deletes it and
-  reads Firestore again, so ended deals are never shown, even offline. A list with no readable end
-  (a store with no list, or no `validUntil`) is read again after `CachedTopLists.MAX_AGE` (12
-  hours). When Firestore fails, a copy that has not ended is shown instead of an error, and a
+  reads Firestore again, so ended deals are never shown, even offline. A list with no readable
+  `validUntil` is read again after `CachedTopLists.MAX_AGE` (12 hours). A store with no list
+  published is not cached, so it is read from Firestore on every open until one is. When Firestore fails, a copy that has not ended is shown instead of an error, and a
   submit writes the new list straight into the cache. Other phones only see a resubmitted list
   once their copy has ended. The database is only a cache, so a schema change drops it (no migrations); its schema is
   still exported to `app/schemas/`, which is committed.

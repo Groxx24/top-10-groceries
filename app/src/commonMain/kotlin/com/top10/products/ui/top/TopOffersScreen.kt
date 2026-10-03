@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -40,6 +41,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun TopOffersRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
     val viewModel = viewModel(key = storeId) { TopOffersViewModel(storeId, container.getTopOffers) }
+    // Every time the screen opens, not only the first: the ViewModel is kept for the whole session.
+    LaunchedEffect(viewModel) { viewModel.onOpened() }
     val state by viewModel.state.collectAsStateWithLifecycle()
     TopOffersScreen(
         state = state,

@@ -73,14 +73,31 @@ class CachedTopListsTest {
     }
 
     @Test
-    fun `a store with no list is cached too`() = runTest {
+    fun `a store with no list is read from Firestore until one is published`() = runTest {
         val store = catalog.stores().first()
 
-        topLists.topOffers(store.id)
-        val again = topLists.topOffers(store.id)
+        assertTrue(topLists.topOffers(store.id).offers.isEmpty())
+        remote.lists[store.id] = listOf(offer(1, "Bananas"))
+        val published = topLists.topOffers(store.id)
 
-        assertEquals(1, remote.reads)
-        assertTrue(again.offers.isEmpty())
+        assertEquals(2, remote.reads)
+        assertEquals(listOf("Bananas"), published.offers.map { it.deal.name.en })
+    }
+
+    @Test
+    fun `each store is cached on its own`() = runTest {
+        val (delhaize, aldi) = catalog.stores()
+        remote.lists[delhaize.id] = listOf(offer(1, "Bananas"))
+        remote.lists[aldi.id] = listOf(offer(1, "Avocados"))
+
+        topLists.topOffers(delhaize.id)
+        val aldiTop = topLists.topOffers(aldi.id)
+        topLists.topOffers(delhaize.id)
+        topLists.topOffers(aldi.id)
+
+        assertEquals(2, remote.reads)
+        assertEquals(aldi, aldiTop.store)
+        assertEquals(listOf("Avocados"), aldiTop.offers.map { it.deal.name.en })
     }
 
     @Test

@@ -22,7 +22,8 @@ import kotlin.time.Instant
  * The top lists, read from [remote] once and kept in [dao], so opening a store again does not read
  * Firestore again. A cached list is kept until the day after the first of its deals ends ("valid
  * until 07/10" keeps it through 7 October in [timeZone]); then it is deleted and read again. A list
- * that gives no end, such as a store with none published, is read again after [maxAge]. When
+ * whose deals give no end is read again after [maxAge]. A store with no list published is not
+ * cached at all, so it is read from Firestore every time until one is. When
  * [remote] fails, a copy that has not ended yet is shown rather than an error. Publishing writes
  * through, so the new list is cached at once.
  */
@@ -69,6 +70,11 @@ class CachedTopLists(
     }
 
     private suspend fun save(top: TopOffers) {
+        if (top.offers.isEmpty()) {
+            // Nothing published yet: keep nothing, so the next open asks Firestore again.
+            dao.delete(top.store.id)
+            return
+        }
         val today = today()
         // The day after the first deal ends; deals whose end cannot be read do not count.
         val expiresOn = top.offers
@@ -116,7 +122,7 @@ class CachedTopLists(
     )
 
     companion object {
-        /** How long a list that gives no end is cached before Firestore is read again. */
+        /** How long a list whose deals give no end is cached before Firestore is read again. */
         val MAX_AGE: Duration = 12.hours
     }
 }
