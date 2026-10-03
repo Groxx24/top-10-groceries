@@ -3,7 +3,10 @@ package com.top10.products.ui.debug
 import com.top10.products.data.hardcoded.HardcodedCatalog
 import com.top10.products.data.hardcoded.HardcodedWeeklyDeals
 import com.top10.products.domain.model.TOP_LIST_SIZE
+import com.top10.products.domain.model.TopOffers
+import com.top10.products.domain.repository.TopListPublisher
 import com.top10.products.domain.usecase.GetWeeklyDealsUseCase
+import com.top10.products.domain.usecase.SubmitTopListUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -12,6 +15,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -25,8 +29,20 @@ class PickTopViewModelTest {
     @After
     fun tearDown() = Dispatchers.resetMain()
 
-    private fun viewModel() =
-        PickTopViewModel("delhaize", GetWeeklyDealsUseCase(HardcodedCatalog(), HardcodedWeeklyDeals()))
+    /** Records what was published, or fails when [fail] is set. */
+    private class FakePublisher(private val fail: Boolean = false) : TopListPublisher {
+        var published: TopOffers? = null
+        override suspend fun publish(top: TopOffers) {
+            if (fail) error("offline")
+            published = top
+        }
+    }
+
+    private fun viewModel(publisher: TopListPublisher = FakePublisher()) = PickTopViewModel(
+        "delhaize",
+        GetWeeklyDealsUseCase(HardcodedCatalog(), HardcodedWeeklyDeals()),
+        SubmitTopListUseCase(publisher),
+    )
 
     private val PickTopViewModel.dealIds get() = state.value.candidates!!.deals.map { it.id }
 
@@ -56,5 +72,44 @@ class PickTopViewModelTest {
 
         assertEquals(TOP_LIST_SIZE - 1, viewModel.state.value.selectedIds.size)
         assertFalse(viewModel.state.value.canSubmit)
+    }
+
+    @Test
+    fun `submit publishes the 10 picks in the order they are listed`() {
+        val publisher = FakePublisher()
+        val viewModel = viewModel(publisher)
+        val ids = viewModel.dealIds
+        ids.take(TOP_LIST_SIZE).reversed().forEach(viewModel::onToggle)
+
+        viewModel.onSubmit()
+
+        val top = publisher.published!!
+        assertEquals("delhaize", top.store.id)
+        assertEquals(ids.take(TOP_LIST_SIZE), top.offers.map { it.deal.id })
+        assertEquals((1..TOP_LIST_SIZE).toList(), top.offers.map { it.rank })
+        assertEquals(SubmitStatus.Submitted, viewModel.state.value.submit)
+    }
+
+    @Test
+    fun `a failed submit is reported and can be retried`() {
+        val viewModel = viewModel(FakePublisher(fail = true))
+        viewModel.dealIds.take(TOP_LIST_SIZE).forEach(viewModel::onToggle)
+
+        viewModel.onSubmit()
+
+        assertEquals(SubmitStatus.Failed, viewModel.state.value.submit)
+        assertTrue(viewModel.state.value.canSubmit)
+    }
+
+    @Test
+    fun `submit does nothing with fewer than 10`() {
+        val publisher = FakePublisher()
+        val viewModel = viewModel(publisher)
+        viewModel.dealIds.take(TOP_LIST_SIZE - 1).forEach(viewModel::onToggle)
+
+        viewModel.onSubmit()
+
+        assertNull(publisher.published)
+        assertEquals(SubmitStatus.Idle, viewModel.state.value.submit)
     }
 }

@@ -15,8 +15,9 @@ kotlin {
     // Android only for now. Shared code already lives in commonMain, so an iOS target is a matter
     // of adding it here plus a Ktor Darwin engine and the Xcode shell.
     androidTarget {
+        // 17 because GitLive's Firestore inline functions are built for 17 and cannot be inlined into 11.
         compilerOptions {
-            jvmTarget = JvmTarget.JVM_11
+            jvmTarget = JvmTarget.JVM_17
         }
     }
 
@@ -71,8 +72,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

@@ -2,7 +2,8 @@ package com.top10.products.domain.model
 
 /**
  * A promotion in a store's folder this week, as the folder prints it. The 20 most relevant are
- * the candidates someone picks a store's top 10 from.
+ * the candidates someone picks a store's top 10 from, and each place in a published top list
+ * ([Offer]) is one of them.
  */
 data class WeeklyDeal(
     /** Unique within one store's deals. */

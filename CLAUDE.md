@@ -27,7 +27,8 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
 - `ui/debug/`: debug builds only. A store picker (the same `StoreList` composable as the store
   list, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
   candidate deals from `GetWeeklyDealsUseCase(storeId)`, a multi-select capped at exactly
-  `TOP_LIST_SIZE` (10), and a "Submit list" button enabled only at 10 that does nothing yet.
+  `TOP_LIST_SIZE` (10), and a "Submit list" button enabled only at 10 that publishes the picks
+  through `SubmitTopListUseCase`.
   Reached from a "Debug" button in the store list header. `MainActivity` passes
   `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is false the button is not shown and
   none of these screens can be reached.
@@ -48,6 +49,11 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   hand for week 40 of 2026: Delhaize's from its own folder (the PDF behind folder-fr.delhaize.be),
   the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
   the sites showed fewer than 20. Scraping would replace it.
+- `TopListPublisher` publishes a store's top list. `data/firebase/FirestoreTopListPublisher`
+  writes it to `topLists/{storeId}`, one document per store replaced on each submit: `storeId`,
+  `storeName`, a server `submittedAt`, and `offers`, the 10 picks in the order they were listed
+  (`rank` 1 to 10) with only the fields the pick screen shows. It calls the `set` overload that
+  takes a serializer: GitLive's inline overloads are built for JVM 17 and the app targets 11.
 - Firebase is set up: the `com.google.gms.google-services` plugin reads `app/google-services.json`
   (gitignored, so every checkout needs its own copy), and Firestore is used through GitLive's
   multiplatform SDK (`dev.gitlive:firebase-firestore`) so the Firebase implementations live in

@@ -1,18 +1,16 @@
 package com.top10.products.ui.debug
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,49 +20,45 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.top10.products.di.AppContainer
 import com.top10.products.domain.model.TOP_LIST_SIZE
 import com.top10.products.domain.model.WeeklyDeal
-import com.top10.products.domain.model.discount
 import com.top10.products.resources.Res
 import com.top10.products.resources.back
-import com.top10.products.resources.deal_loyalty_card
-import com.top10.products.resources.deal_percent_minus
-import com.top10.products.resources.deal_price
-import com.top10.products.resources.deal_valid_until
 import com.top10.products.resources.debug_deals_error_title
 import com.top10.products.resources.debug_pick_top_title
 import com.top10.products.resources.debug_pick_top_title_loading
 import com.top10.products.resources.debug_selected_count
 import com.top10.products.resources.debug_submit
+import com.top10.products.resources.debug_submit_failed
+import com.top10.products.resources.debug_submitted
 import com.top10.products.resources.error_hint
 import com.top10.products.resources.loading
 import com.top10.products.resources.retry
 import com.top10.products.ui.BackArrow
 import com.top10.products.ui.Message
-import com.top10.products.ui.top.formatEuros
+import com.top10.products.ui.deal.DealInfo
 import org.jetbrains.compose.resources.stringResource
-import kotlin.math.roundToInt
 
 @Composable
 fun PickTopRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
-    val viewModel = viewModel(key = "pick-top-$storeId") { PickTopViewModel(storeId, container.getWeeklyDeals) }
+    val viewModel = viewModel(key = "pick-top-$storeId") {
+        PickTopViewModel(storeId, container.getWeeklyDeals, container.submitTopList)
+    }
     val state by viewModel.state.collectAsStateWithLifecycle()
     PickTopScreen(
         state = state,
@@ -72,6 +66,7 @@ fun PickTopRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
         onRetry = viewModel::onRetry,
         onToggle = viewModel::onToggle,
         onSubmit = viewModel::onSubmit,
+        onSubmitResultShown = viewModel::onSubmitResultShown,
     )
 }
 
@@ -84,8 +79,22 @@ fun PickTopScreen(
     onRetry: () -> Unit,
     onToggle: (dealId: String) -> Unit,
     onSubmit: () -> Unit,
+    onSubmitResultShown: () -> Unit,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val submittedMessage = stringResource(Res.string.debug_submitted)
+    val submitFailedMessage = stringResource(Res.string.debug_submit_failed)
+    LaunchedEffect(state.submit) {
+        val message = when (state.submit) {
+            SubmitStatus.Submitted -> submittedMessage
+            SubmitStatus.Failed -> submitFailedMessage
+            else -> return@LaunchedEffect
+        }
+        snackbarHostState.showSnackbar(message)
+        onSubmitResultShown()
+    }
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -103,7 +112,12 @@ fun PickTopScreen(
         },
         bottomBar = {
             if (state.candidates != null) {
-                SubmitBar(selectedCount = state.selectedIds.size, canSubmit = state.canSubmit, onSubmit = onSubmit)
+                SubmitBar(
+                    selectedCount = state.selectedIds.size,
+                    canSubmit = state.canSubmit,
+                    isSubmitting = state.submit == SubmitStatus.Submitting,
+                    onSubmit = onSubmit,
+                )
             }
         },
     ) { padding ->
@@ -150,75 +164,14 @@ private fun DealRow(deal: WeeklyDeal, selected: Boolean, enabled: Boolean, onTog
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(checked = selected, onCheckedChange = { onToggle() }, enabled = enabled)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = deal.name,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
-                listOfNotNull(deal.brand, deal.packageSize).takeIf { it.isNotEmpty() }?.let {
-                    Text(
-                        text = it.joinToString(" · "),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                // The folder's own wording; the percentage off only when it printed none.
-                val label = deal.label
-                    ?: deal.discount?.let { stringResource(Res.string.deal_percent_minus, (it * 100).roundToInt()) }
-                if (label != null) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(6.dp))
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
-                    )
-                }
-                DealDetails(deal)
-            }
+            DealInfo(deal, Modifier.weight(1f))
         }
     }
 }
 
-/**
- * "~~€6.18~~ €3.09 /2 · Until 07/10 · Loyalty card needed", with only what the folder gives. The
- * deal price is in red; the original price before it is struck through.
- */
-@Composable
-private fun DealDetails(deal: WeeklyDeal) {
-    val regularPrice = deal.regularPrice?.let { stringResource(Res.string.deal_price, formatEuros(it)) }
-    val price = deal.price?.let { stringResource(Res.string.deal_price, formatEuros(it)) }
-    val rest = listOfNotNull(
-        deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
-        if (deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
-    )
-    val dealPriceColor = MaterialTheme.colorScheme.error
-    Text(
-        text = buildAnnotatedString {
-            if (price != null) {
-                if (regularPrice != null) {
-                    withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { append(regularPrice) }
-                    append(" ")
-                }
-                withStyle(SpanStyle(color = dealPriceColor, fontWeight = FontWeight.Bold)) { append(price) }
-                deal.priceUnit?.let { append(" $it") }
-                if (rest.isNotEmpty()) append(" · ")
-            }
-            append(rest.joinToString(" · "))
-        },
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
-}
-
 /** How many are picked, and the button that is enabled only at exactly [TOP_LIST_SIZE]. */
 @Composable
-private fun SubmitBar(selectedCount: Int, canSubmit: Boolean, onSubmit: () -> Unit) {
+private fun SubmitBar(selectedCount: Int, canSubmit: Boolean, isSubmitting: Boolean, onSubmit: () -> Unit) {
     Surface(tonalElevation = 3.dp, shadowElevation = 3.dp) {
         Row(
             modifier = Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp),
@@ -228,9 +181,10 @@ private fun SubmitBar(selectedCount: Int, canSubmit: Boolean, onSubmit: () -> Un
             Text(
                 text = stringResource(Res.string.debug_selected_count, selectedCount, TOP_LIST_SIZE),
                 style = MaterialTheme.typography.titleSmall,
-                color = if (canSubmit) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                color = if (selectedCount == TOP_LIST_SIZE) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.weight(1f),
             )
+            if (isSubmitting) CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 2.dp)
             Button(onClick = onSubmit, enabled = canSubmit) { Text(stringResource(Res.string.debug_submit)) }
         }
     }

@@ -18,7 +18,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,12 +41,10 @@ import org.jetbrains.compose.resources.stringResource
 fun TopOffersRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
     val viewModel = viewModel(key = storeId) { TopOffersViewModel(storeId, container.getTopOffers) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val uriHandler = LocalUriHandler.current
     TopOffersScreen(
         state = state,
         onBack = onBack,
         onRetry = viewModel::onRetry,
-        onOpenProduct = { url -> uriHandler.openUri(url) },
     )
 }
 
@@ -57,7 +54,6 @@ fun TopOffersScreen(
     state: TopOffersUiState,
     onBack: () -> Unit,
     onRetry: () -> Unit,
-    onOpenProduct: (String) -> Unit,
 ) {
     Scaffold(
         topBar = {
@@ -79,7 +75,7 @@ fun TopOffersScreen(
         Box(Modifier.fillMaxSize().padding(padding)) {
             val top = state.top
             when {
-                top != null -> OfferList(top = top, onOpenProduct = onOpenProduct)
+                top != null -> OfferList(top)
 
                 state.loadFailed -> Message(
                     title = stringResource(Res.string.error_title),
@@ -97,7 +93,7 @@ fun TopOffersScreen(
 }
 
 @Composable
-private fun OfferList(top: TopOffers, onOpenProduct: (String) -> Unit) {
+private fun OfferList(top: TopOffers) {
     if (top.offers.isEmpty()) {
         Message(
             title = stringResource(Res.string.empty_title),
@@ -109,8 +105,8 @@ private fun OfferList(top: TopOffers, onOpenProduct: (String) -> Unit) {
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(top.offers, key = { it.productId }) { offer ->
-            OfferCard(offer = offer, onOpenProduct = onOpenProduct)
+        items(top.offers, key = { it.rank }) { offer ->
+            OfferCard(offer)
         }
     }
 }
