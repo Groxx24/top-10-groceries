@@ -29,8 +29,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -179,18 +183,32 @@ private fun DealRow(deal: WeeklyDeal, selected: Boolean, enabled: Boolean, onTog
     }
 }
 
-/** "€3.09 /2 · Until 07/10 · Loyalty card needed", with only what the folder gives. */
+/**
+ * "~~€6.18~~ €3.09 /2 · Until 07/10 · Loyalty card needed", with only what the folder gives. The
+ * deal price is in red; the original price before it is struck through.
+ */
 @Composable
 private fun DealDetails(deal: WeeklyDeal) {
-    val details = listOfNotNull(
-        deal.price?.let { price ->
-            listOfNotNull(stringResource(Res.string.deal_price, formatEuros(price)), deal.priceUnit).joinToString(" ")
-        },
+    val regularPrice = deal.regularPrice?.let { stringResource(Res.string.deal_price, formatEuros(it)) }
+    val price = deal.price?.let { stringResource(Res.string.deal_price, formatEuros(it)) }
+    val rest = listOfNotNull(
         deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
         if (deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
     )
+    val dealPriceColor = MaterialTheme.colorScheme.error
     Text(
-        text = details.joinToString(" · "),
+        text = buildAnnotatedString {
+            if (price != null) {
+                if (regularPrice != null) {
+                    withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { append(regularPrice) }
+                    append(" ")
+                }
+                withStyle(SpanStyle(color = dealPriceColor, fontWeight = FontWeight.Bold)) { append(price) }
+                deal.priceUnit?.let { append(" $it") }
+                if (rest.isNotEmpty()) append(" · ")
+            }
+            append(rest.joinToString(" · "))
+        },
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = 1,

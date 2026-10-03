@@ -41,33 +41,34 @@ class HardcodedWeeklyDeals : WeeklyDealsRepository {
         // The label is the deal as the source printed it, or null when it gave only prices.
         val DEALS: Map<String, List<WeeklyDeal>> = mapOf(
             // From Delhaize's own folder for week 40 (01/10 to 07/10/2026), names and deals as
-            // printed. Every Delhaize promo needs a SuperPlus card, registered or not. Prices are
-            // for the quantity in the folder's example, hence the unit.
+            // printed. Every Delhaize promo needs a SuperPlus card, registered or not. Prices, and
+            // the original prices next to them, are for the quantity in the folder's example,
+            // hence the unit; the folder prints no original price for some.
             "delhaize" to deals(
                 "delhaize",
                 listOf(
                     deal("Chicons", null, "650 g", "1+1 gratis", null, card = true, until = "07/10"),
-                    deal("Produit veggie ou veggie bio", "Delhaize", "150 g à 500 g", "1+1 gratis", 3.09, "/2", card = true, until = "07/10"),
-                    deal("Œufs de poules élevées en plein air", null, "6 pièces", "2e à -50%", 3.23, "/2", card = true, until = "07/10"),
-                    deal("Moules jumbo", null, "1 kg ou 2 kg", "2e à -50%", 11.97, "/2", card = true, until = "07/10"),
-                    deal("Aiguillettes de poulet", null, "Poids variable", "2e à -50%", 9.67, "/kg", card = true, until = "07/10"),
-                    deal("Viande de boeuf: châteaubriand, contrefilet ou rumsteak", null, "Poids variable", "-20%", 19.99, "/kg", card = true, until = "07/10"),
-                    deal("Dos de cabillaud", null, "Poids variable", "2e à -40%", 31.99, "/kg", card = true, until = "07/10"),
-                    deal("Charcuterie", "Breydel", "150 g, 300 g ou poids variable", "2e à -50%", 6.59, "/2", card = true, until = "07/10"),
-                    deal("Fromage", "Oudendijk", "180 g, 250 g ou poids variable", "2e à -50%", 6.74, "/2", card = true, until = "07/10"),
-                    deal("Beurre ou crème culinaire", "Carlsbourg", "200 g à 250 g, 200 ml ou 250 ml", "2e à -50%", 3.68, "/2", card = true, until = "07/10"),
-                    deal("Pâtes", "Panzani", "500 g", "2e à -50%", 3.29, "/2", card = true, until = "07/10"),
-                    deal("Légumes en conserve", "Bonduelle", "255 g à 800 g", "1+1 gratis", 2.49, "/2", card = true, until = "07/10"),
-                    deal("Pizza Holy Slice", "Iglo", "327 g à 570 g", "1+1 gratis", 5.49, "/2", card = true, until = "07/10"),
-                    deal("Frites spéciales ou patates rissolées", "Belviva", "600 g ou 750 g", "1+1 gratis", 4.49, "/2", card = true, until = "07/10"),
-                    deal("Café en grains ou moulu", "Lavazza", "250 g à 1 kg", "2e à -70%", 10.39, "/2", card = true, until = "07/10"),
+                    deal("Produit veggie ou veggie bio", "Delhaize", "150 g à 500 g", "1+1 gratis", 3.09, "/2", was = 6.18, card = true, until = "07/10"),
+                    deal("Œufs de poules élevées en plein air", null, "6 pièces", "2e à -50%", 3.23, "/2", was = 4.30, card = true, until = "07/10"),
+                    deal("Moules jumbo", null, "1 kg ou 2 kg", "2e à -50%", 11.97, "/2", was = 15.96, card = true, until = "07/10"),
+                    deal("Aiguillettes de poulet", null, "Poids variable", "2e à -50%", 9.67, "/kg", was = 12.89, card = true, until = "07/10"),
+                    deal("Viande de boeuf: châteaubriand, contrefilet ou rumsteak", null, "Poids variable", "-20%", 19.99, "/kg", was = 24.99, card = true, until = "07/10"),
+                    deal("Dos de cabillaud", null, "Poids variable", "2e à -40%", 31.99, "/kg", was = 39.99, card = true, until = "07/10"),
+                    deal("Charcuterie", "Breydel", "150 g, 300 g ou poids variable", "2e à -50%", 6.59, "/2", was = 8.78, card = true, until = "07/10"),
+                    deal("Fromage", "Oudendijk", "180 g, 250 g ou poids variable", "2e à -50%", 6.74, "/2", was = 8.98, card = true, until = "07/10"),
+                    deal("Beurre ou crème culinaire", "Carlsbourg", "200 g à 250 g, 200 ml ou 250 ml", "2e à -50%", 3.68, "/2", was = 4.90, card = true, until = "07/10"),
+                    deal("Pâtes", "Panzani", "500 g", "2e à -50%", 3.29, "/2", was = 4.38, card = true, until = "07/10"),
+                    deal("Légumes en conserve", "Bonduelle", "255 g à 800 g", "1+1 gratis", 2.49, "/2", was = 4.98, card = true, until = "07/10"),
+                    deal("Pizza Holy Slice", "Iglo", "327 g à 570 g", "1+1 gratis", 5.49, "/2", was = 10.98, card = true, until = "07/10"),
+                    deal("Frites spéciales ou patates rissolées", "Belviva", "600 g ou 750 g", "1+1 gratis", 4.49, "/2", was = 8.98, card = true, until = "07/10"),
+                    deal("Café en grains ou moulu", "Lavazza", "250 g à 1 kg", "2e à -70%", 10.39, "/2", was = 15.98, card = true, until = "07/10"),
                     deal("Coca-Cola Original ou Zero", "Coca-Cola", "12 x 37,5 cl", "9+3 gratis", 11.70, "/promopack", card = true, until = "07/10"),
                     deal("Plus de 250 vins et bulles", null, "75 cl", "2+1 gratis", null, card = true, until = "21/10"),
-                    deal("Produit pour la lessive ou détachant", "Dash", "15 à 80 doses", "1+1 gratis", 22.99, "/2", card = true, until = "14/10"),
+                    deal("Produit pour la lessive ou détachant", "Dash", "15 à 80 doses", "1+1 gratis", 22.99, "/2", was = 45.98, card = true, until = "14/10"),
                     deal("Papier toilette Moltonel", "Lotus", "18 rouleaux", "12+6 gratis", 9.32, "/promopack", card = true, until = "14/10"),
-                    deal("Langes Skin Love", "Pampers", "23 à 29 pièces", "-50%", 8.00, card = true, until = "07/10"),
-                    deal("Donut Worry Be Happy", null, "Pièce", "3+3 gratis", 3.75, "/6", card = true, until = "07/10"),
-                    deal("Yaourt pomme/cannelle", "Delhaize", "180 g", "2e à -50%", 1.43, "/2", card = true, until = "07/10"),
+                    deal("Langes Skin Love", "Pampers", "23 à 29 pièces", "-50%", 8.00, was = 15.99, card = true, until = "07/10"),
+                    deal("Donut Worry Be Happy", null, "Pièce", "3+3 gratis", 3.75, "/6", was = 7.50, card = true, until = "07/10"),
+                    deal("Yaourt pomme/cannelle", "Delhaize", "180 g", "2e à -50%", 1.43, "/2", was = 1.90, card = true, until = "07/10"),
                 ),
             ),
             // Folder valid 28/09 to 03/10. ALDI prints most deals as a price only.
