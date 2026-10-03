@@ -1,10 +1,10 @@
-# Top 10 Groceries
+# Top 10 Products
 
 Shows the ten best offers of the week at a grocery store. The app picks a store, then reads that
 store's top list by its id; it does no ranking itself. The lists are made by a separate master app
 and will be published to Firebase. Until then they are hardcoded. Built with Compose
 Multiplatform, Android target only for now. Single Gradle module `:app`, package
-`com.top10.groceries`.
+`com.top10.products`.
 
 ## Architecture
 

@@ -41,17 +41,17 @@ kotlin {
 }
 
 compose.resources {
-    packageOfResClass = "com.top10.groceries.resources"
+    packageOfResClass = "com.top10.products.resources"
 }
 
 android {
-    namespace = "com.top10.groceries"
+    namespace = "com.top10.products"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.top10.groceries"
+        applicationId = "com.top10.products"
         minSdk = 29
         targetSdk = 36
         versionCode = 1
