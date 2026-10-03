@@ -24,12 +24,15 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
 - `ui/stores/`: the entry point, a list of stores from `GetStoresUseCase`.
 - `ui/top/`: the top list of one store, opened with its `storeId` and loaded through
   `GetTopOffersUseCase(storeId)`. Nothing in the UI or domain is specific to a store.
-- `ui/debug/`: a debug-only screen listing the stores (the same `StoreList` composable as the
-  store list) under "Pick a store to submit 10 products for"; picking one does nothing yet. Opened from a "Debug" button in the store
-  list header. `MainActivity` passes `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is
-  false the button is not shown and the screen cannot be reached.
-- Navigation is a `rememberSaveable` store id plus a debug-screen flag in `ui/App.kt`; back goes
-  to the store list.
+- `ui/debug/`: debug builds only. A store picker (the same `StoreList` composable as the store
+  list, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
+  candidate deals from `GetWeeklyDealsUseCase(storeId)`, a multi-select capped at exactly
+  `TOP_LIST_SIZE` (10), and a "Submit list" button enabled only at 10 that does nothing yet.
+  Reached from a "Debug" button in the store list header. `MainActivity` passes
+  `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is false the button is not shown and
+  none of these screens can be reached.
+- Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag
+  and the store being picked for. Back goes one screen up.
 
 ## Data
 
@@ -40,6 +43,11 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   both are implemented by `data/hardcoded/HardcodedCatalog`, which holds five stores (Delhaize,
   Aldi, Lidl, Intermarché, Spar), each with ten made-up products. Moving to Firebase means writing Firebase implementations of those two interfaces and
   swapping them in `AppContainer`; nothing above the data layer changes.
+- `WeeklyDealsRepository` gives a store's deals of the week, most relevant first; the debug flow
+  offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` is typed in by
+  hand for week 40 of 2026: Delhaize's from its own folder (the PDF behind folder-fr.delhaize.be),
+  the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
+  the sites showed fewer than 20. Scraping would replace it.
 - Firebase is set up: the `com.google.gms.google-services` plugin reads `app/google-services.json`
   (gitignored, so every checkout needs its own copy), and Firestore is used through GitLive's
   multiplatform SDK (`dev.gitlive:firebase-firestore`) so the Firebase implementations live in
