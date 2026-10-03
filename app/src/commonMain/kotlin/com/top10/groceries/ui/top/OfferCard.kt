@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -38,18 +39,21 @@ import kotlin.math.roundToInt
 @Composable
 fun OfferCard(offer: Offer, onOpenProduct: (String) -> Unit) {
     val content: @Composable () -> Unit = {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                RankBadge(offer.rank)
+        Row(
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box {
                 ProductImage(offer.imageUrl)
-                Column(Modifier.weight(1f)) {
+                RankBadge(offer.rank, Modifier.align(Alignment.TopStart).offset(x = (-4).dp, y = (-4).dp))
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Column {
                     offer.brand?.let {
                         Text(
                             text = it,
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -57,7 +61,7 @@ fun OfferCard(offer: Offer, onOpenProduct: (String) -> Unit) {
                     }
                     Text(
                         text = offer.name,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -70,9 +74,9 @@ fun OfferCard(offer: Offer, onOpenProduct: (String) -> Unit) {
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+                DealSummary(offer)
+                DealDetails(offer)
             }
-            DealSummary(offer)
-            DealDetails(offer)
         }
     }
     val url = offer.productUrl
@@ -84,14 +88,14 @@ fun OfferCard(offer: Offer, onOpenProduct: (String) -> Unit) {
 }
 
 @Composable
-private fun RankBadge(rank: Int) {
+private fun RankBadge(rank: Int, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier.size(32.dp).background(MaterialTheme.colorScheme.primary, CircleShape),
+        modifier = modifier.size(24.dp).background(MaterialTheme.colorScheme.primary, CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = rank.toString(),
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimary,
         )
@@ -106,7 +110,7 @@ private fun ProductImage(url: String?) {
         contentDescription = null,
         contentScale = ContentScale.Fit,
         modifier = Modifier
-            .size(64.dp)
+            .size(72.dp)
             .clip(RoundedCornerShape(8.dp))
             .background(Color.White)
             .padding(4.dp),
@@ -118,17 +122,17 @@ private fun ProductImage(url: String?) {
 private fun DealSummary(offer: Offer) {
     val deal = offer.deal
     Row(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = deal.label,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.tertiaryContainer, RoundedCornerShape(6.dp))
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 6.dp, vertical = 2.dp),
         )
         val percentOff = stringResource(Res.string.deal_percent_off, (deal.discount * 100).roundToInt())
         Text(
@@ -137,7 +141,7 @@ private fun DealSummary(offer: Offer) {
             } else {
                 percentOff
             },
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Medium,
         )
     }

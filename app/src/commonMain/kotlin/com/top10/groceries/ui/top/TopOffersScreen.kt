@@ -107,7 +107,7 @@ private fun OfferList(top: TopOffers, onOpenProduct: (String) -> Unit) {
     }
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(top.offers, key = { it.productId }) { offer ->
             OfferCard(offer = offer, onOpenProduct = onOpenProduct)
