@@ -1,5 +1,6 @@
 package com.top10.products.data.firebase
 
+import com.top10.products.domain.model.LocalizedText
 import com.top10.products.domain.model.Offer
 import com.top10.products.domain.model.TopOffers
 import com.top10.products.domain.model.WeeklyDeal
@@ -13,7 +14,8 @@ import kotlinx.serialization.Serializable
 
 /**
  * The stores' top lists in Firestore, one document per store at `topLists/{storeId}`, replaced on
- * every submit. Each entry holds what the pick screen shows for a deal, nothing more. The store
+ * every submit. Each entry holds what the pick screen shows for a deal, nothing more, with the
+ * name, pack size and label in English, French and Dutch. The store
  * itself comes from [stores], so a store without a document has an empty list.
  */
 class FirestoreTopLists(
@@ -45,10 +47,10 @@ class FirestoreTopLists(
 
     private fun Offer.toEntry() = TopListEntry(
         rank = rank,
-        name = deal.name,
+        name = deal.name.toEntry(),
         brand = deal.brand,
-        packageSize = deal.packageSize,
-        label = deal.label,
+        packageSize = deal.packageSize?.toEntry(),
+        label = deal.label?.toEntry(),
         price = deal.price,
         priceUnit = deal.priceUnit,
         regularPrice = deal.regularPrice,
@@ -60,10 +62,10 @@ class FirestoreTopLists(
         rank = rank,
         deal = WeeklyDeal(
             id = "$storeId-top-$rank",
-            name = name,
+            name = name.toText(),
             brand = brand,
-            packageSize = packageSize,
-            label = label,
+            packageSize = packageSize?.toText(),
+            label = label?.toText(),
             price = price,
             priceUnit = priceUnit,
             regularPrice = regularPrice,
@@ -71,6 +73,10 @@ class FirestoreTopLists(
             validUntil = validUntil,
         ),
     )
+
+    private fun LocalizedText.toEntry() = TextEntry(en = en, fr = fr, nl = nl)
+
+    private fun TextEntry.toText() = LocalizedText(en = en, fr = fr, nl = nl)
 
     private companion object {
         const val COLLECTION = "topLists"
@@ -90,13 +96,21 @@ private data class TopListDocument(
 @Serializable
 private data class TopListEntry(
     val rank: Int,
-    val name: String,
+    val name: TextEntry,
     val brand: String? = null,
-    val packageSize: String? = null,
-    val label: String? = null,
+    val packageSize: TextEntry? = null,
+    val label: TextEntry? = null,
     val price: Double? = null,
     val priceUnit: String? = null,
     val regularPrice: Double? = null,
     val needsLoyaltyCard: Boolean = false,
     val validUntil: String? = null,
+)
+
+/** A text in every language the app has, so each phone shows its own. */
+@Serializable
+private data class TextEntry(
+    val en: String,
+    val fr: String,
+    val nl: String,
 )

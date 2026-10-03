@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -28,33 +29,35 @@ import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 /**
- * A deal as the folder gives it: name, brand and pack size, the deal label, and the prices. The
- * pick screen and the published top list both show deals this way.
+ * A deal as the folder gives it, in the phone's language: name, brand and pack size, the deal
+ * label, and the prices. The pick screen and the published top list both show deals this way.
  */
 @Composable
 fun DealInfo(deal: WeeklyDeal, modifier: Modifier = Modifier) {
+    // The phone's language, falling back to English like the app's own strings do.
+    val language = Locale.current.language
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
-            text = deal.name,
+            text = deal.name.inLanguage(language),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
         )
-        listOfNotNull(deal.brand, deal.packageSize).takeIf { it.isNotEmpty() }?.let {
+        listOfNotNull(deal.brand, deal.packageSize?.inLanguage(language)).takeIf { it.isNotEmpty() }?.let {
             Text(
                 text = it.joinToString(" · "),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        DealLabel(deal)
+        DealLabel(deal, language)
         DealDetails(deal)
     }
 }
 
 /** The folder's own wording; the percentage off only when it printed none. */
 @Composable
-private fun DealLabel(deal: WeeklyDeal) {
-    val label = deal.label
+private fun DealLabel(deal: WeeklyDeal, language: String) {
+    val label = deal.label?.inLanguage(language)
         ?: deal.discount?.let { stringResource(Res.string.deal_percent_minus, (it * 100).roundToInt()) }
         ?: return
     Text(

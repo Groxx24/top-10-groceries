@@ -8,12 +8,12 @@ package com.top10.products.domain.model
 data class WeeklyDeal(
     /** Unique within one store's deals. */
     val id: String,
-    val name: String,
+    val name: LocalizedText,
     val brand: String?,
     /** Pack size as the store prints it ("500 g", "6 x 25 cl"), if known. */
-    val packageSize: String?,
+    val packageSize: LocalizedText?,
     /** The deal in the store's own words ("1+1 gratis", "-31%"), shown as is; null when the folder gives only prices. */
-    val label: String?,
+    val label: LocalizedText?,
     /** What the deal costs, in euros, if the folder gives it. */
     val price: Double?,
     /** What [price] is for, as the folder prints it ("/2", "/kg", "/promopack"); null for one item. */

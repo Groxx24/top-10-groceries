@@ -44,7 +44,10 @@ The app is for Belgium: English (`composeResources/values/`, the fallback), Fren
 Every string goes in all three files with the same keys. Prices follow each language's format
 through `deal_price` and `decimal_separator` (`€3.09`, `3,09 €`, `€ 3,09`), so never build a price
 string in code. The launcher name is `app_name` in `androidMain/res/values{,-fr,-nl}/`.
-Product names and deal labels are data and stay as the store printed them.
+A deal's name, pack size and label are data in all three languages too: `LocalizedText` (`en`,
+`fr`, `nl`), shown with `inLanguage(Locale.current.language)` so they follow the same fallback as
+the strings. French and Dutch come from the stores' own folders where we have them (Delhaize
+prints both); English is always translated. Submitting publishes all three.
 
 ## Data
 
@@ -63,7 +66,8 @@ Product names and deal labels are data and stay as the store printed them.
   the app reads and the `TopListPublisher` the debug screen writes: `topLists/{storeId}`, one
   document per store replaced on each submit, with `storeId`, `storeName`, a server
   `submittedAt`, and `offers`, the 10 picks in the order they were listed (`rank` 1 to 10) with
-  only the fields the pick screen shows. A store with no document shows the empty state.
+  only the fields the pick screen shows; `name`, `packageSize` and `label` are `{en, fr, nl}`
+  maps. A store with no document shows the empty state.
 - `DebugLock` guards the debug screens. `data/lock/HashedDebugLock` holds only a salt and a
   PBKDF2-SHA256 hash of the passphrase (`data/lock/DebugPassphrase.kt`, 100,000 iterations, via
   `org.kotlincrypto.macs:hmac-sha2` because common code has no `java.security`). Change the
