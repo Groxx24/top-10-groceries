@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Deep green, lit from the top left, with faint rays fanning out from behind the badge. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M0,0 H108 V108 H0 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="0"
+                android:startY="0"
+                android:endX="108"
+                android:endY="108"
+                android:startColor="#FF43A05A"
+                android:endColor="#FF14432A" />
+        </aapt:attr>
+    </path>
+    <path android:pathData="M54,62 L113.9,58.3 L113.9,65.7 Z M54,62 L107.7,88.8 L104.0,95.1 Z M54,62 L87.1,112.0 L80.8,115.7 Z M54,62 L57.7,121.9 L50.3,121.9 Z M54,62 L27.2,115.7 L20.9,112.0 Z M54,62 L4.0,95.1 L0.3,88.8 Z M54,62 L-5.9,65.7 L-5.9,58.3 Z M54,62 L0.3,35.2 L4.0,28.9 Z M54,62 L20.9,12.0 L27.2,8.3 Z M54,62 L50.3,2.1 L57.7,2.1 Z M54,62 L80.8,8.3 L87.1,12.0 Z M54,62 L104.0,28.9 L107.7,35.2 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="54"
+                android:centerY="62"
+                android:gradientRadius="50"
+                android:startColor="#38FFFFFF"
+                android:endColor="#00FFFFFF" />
+        </aapt:attr>
+    </path>
+</vector>
