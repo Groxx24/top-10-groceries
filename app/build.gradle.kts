@@ -6,6 +6,9 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.compose.multiplatform)
+    // Reads app/google-services.json (kept out of git) and sets up the default Firebase app.
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 kotlin {
@@ -32,10 +35,14 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+            implementation(libs.gitlive.firebase.firestore)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            // Reports crashes by itself once the app starts; nothing in the code calls it.
+            implementation(libs.firebase.crashlytics)
         }
     }
 }

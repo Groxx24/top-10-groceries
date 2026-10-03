@@ -11,6 +11,12 @@ coroutines = "1.10.2"
 ktor = "3.3.1"
 serialization = "1.9.0"
 coil = "3.3.0"
+googleServices = "4.4.4"
+crashlyticsPlugin = "3.0.8"
+# The Firebase Android SDK version that GitLive 2.7.0 is built against.
+firebaseBom = "34.18.0"
+# Kotlin Multiplatform wrapper around the Firebase SDKs, so the data layer stays in commonMain.
+gitliveFirebase = "2.7.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -31,6 +37,9 @@ ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref =
 ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
 coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", version.ref = "coil" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
+gitlive-firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "gitliveFirebase" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -38,3 +47,5 @@ kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref 
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }

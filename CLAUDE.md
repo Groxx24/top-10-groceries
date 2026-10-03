@@ -32,9 +32,15 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   1 to 10) with its `Deal`: the store's label, the share of the normal price saved, and how many
   items must be bought.
 - `StoreRepository` and `TopOffersRepository` (`domain/repository/`) are the only way in. Today
-  both are implemented by `data/hardcoded/HardcodedCatalog`, which holds Delhaize and ten made-up
-  products. Moving to Firebase means writing Firebase implementations of those two interfaces and
+  both are implemented by `data/hardcoded/HardcodedCatalog`, which holds five stores (Delhaize,
+  Aldi, Lidl, Intermarché, Spar), each with ten made-up products. Moving to Firebase means writing Firebase implementations of those two interfaces and
   swapping them in `AppContainer`; nothing above the data layer changes.
+- Firebase is set up: the `com.google.gms.google-services` plugin reads `app/google-services.json`
+  (gitignored, so every checkout needs its own copy), and Firestore is used through GitLive's
+  multiplatform SDK (`dev.gitlive:firebase-firestore`) so the Firebase implementations live in
+  `commonMain` like the rest of the data layer. The Firebase BoM in `androidMain` is pinned to the
+  version that GitLive release is built against. Crashlytics (plugin plus the Android SDK in
+  `androidMain`) reports crashes on its own; no code calls it.
 
 ## Build
 
