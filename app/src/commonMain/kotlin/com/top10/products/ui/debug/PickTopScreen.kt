@@ -52,6 +52,7 @@ import com.top10.products.resources.retry
 import com.top10.products.ui.BackArrow
 import com.top10.products.ui.Message
 import com.top10.products.ui.deal.DealInfo
+import com.top10.products.ui.deal.DealPicture
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -164,6 +165,7 @@ private fun DealRow(deal: WeeklyDeal, selected: Boolean, enabled: Boolean, onTog
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(checked = selected, onCheckedChange = { onToggle() }, enabled = enabled)
+            DealPicture(deal.category)
             DealInfo(deal, Modifier.weight(1f))
         }
     }

@@ -54,6 +54,9 @@ prints both); English is always translated. Submitting publishes all three.
 - `Store` is an `id`, a display `name` and a logo. `WeeklyDeal` is a promotion as a store's folder
   prints it; `Offer` is one already-ranked place in a published list (`rank` 1 to 10) holding
   its `WeeklyDeal`, and `ui/deal/DealInfo` draws a deal the same way on both screens.
+- There are no product photos. Each `WeeklyDeal` has a `ProductCategory`, and `ui/deal/DealPicture`
+  draws it as an emoji on a tinted tile, next to the deal on the pick screen and with a rank badge
+  (gold, silver, bronze for the top 3) in the top list. The emoji and tint live only in the UI.
 - `StoreRepository` is implemented by `data/hardcoded/HardcodedCatalog`: five stores (Delhaize,
   Aldi, Lidl, Intermarché, Spar). Moving the stores to Firebase means a Firebase implementation
   swapped in `AppContainer`; nothing above the data layer changes.
@@ -67,7 +70,8 @@ prints both); English is always translated. Submitting publishes all three.
   document per store replaced on each submit, with `storeId`, `storeName`, a server
   `submittedAt`, and `offers`, the 10 picks in the order they were listed (`rank` 1 to 10) with
   only the fields the pick screen shows; `name`, `packageSize` and `label` are `{en, fr, nl}`
-  maps. A store with no document shows the empty state.
+  maps, and `category` is a `ProductCategory` name (missing or unknown reads as `OTHER`, so never
+  rename an entry). A store with no document shows the empty state.
 - `DebugLock` guards the debug screens. `data/lock/HashedDebugLock` holds only a salt and a
   PBKDF2-SHA256 hash of the passphrase (`data/lock/DebugPassphrase.kt`, 100,000 iterations, via
   `org.kotlincrypto.macs:hmac-sha2` because common code has no `java.security`). Change the

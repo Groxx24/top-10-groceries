@@ -2,6 +2,7 @@ package com.top10.products.data.hardcoded
 
 import com.top10.products.domain.model.CANDIDATE_COUNT
 import com.top10.products.domain.model.LocalizedText
+import com.top10.products.domain.model.ProductCategory
 import com.top10.products.domain.model.WeeklyDeal
 import com.top10.products.domain.model.discount
 import com.top10.products.domain.usecase.GetWeeklyDealsUseCase
@@ -34,6 +35,15 @@ class HardcodedWeeklyDealsTest {
                 for (text in listOfNotNull(deal.name, deal.packageSize, deal.label)) {
                     assertTrue("${deal.id}: $text", listOf(text.en, text.fr, text.nl).none { it.isBlank() })
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `every candidate has a category to draw`() = runTest {
+        for (store in catalog.stores()) {
+            for (deal in getWeeklyDeals(store.id).deals) {
+                assertTrue(deal.id, deal.category != ProductCategory.OTHER)
             }
         }
     }

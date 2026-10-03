@@ -22,6 +22,8 @@ data class WeeklyDeal(
     val regularPrice: Double? = null,
     /** True when the deal only applies with the store's loyalty card or app. */
     val needsLoyaltyCard: Boolean = false,
+    /** What kind of product it is; the app shows it as a picture. */
+    val category: ProductCategory = ProductCategory.OTHER,
     /** Last day of the deal as the store prints it ("07/10"), if known. */
     val validUntil: String?,
 )

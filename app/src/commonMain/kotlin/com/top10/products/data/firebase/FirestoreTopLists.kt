@@ -2,6 +2,7 @@ package com.top10.products.data.firebase
 
 import com.top10.products.domain.model.LocalizedText
 import com.top10.products.domain.model.Offer
+import com.top10.products.domain.model.ProductCategory
 import com.top10.products.domain.model.TopOffers
 import com.top10.products.domain.model.WeeklyDeal
 import com.top10.products.domain.repository.StoreRepository
@@ -55,6 +56,7 @@ class FirestoreTopLists(
         priceUnit = deal.priceUnit,
         regularPrice = deal.regularPrice,
         needsLoyaltyCard = deal.needsLoyaltyCard,
+        category = deal.category.name,
         validUntil = deal.validUntil,
     )
 
@@ -70,6 +72,7 @@ class FirestoreTopLists(
             priceUnit = priceUnit,
             regularPrice = regularPrice,
             needsLoyaltyCard = needsLoyaltyCard,
+            category = ProductCategory.fromName(category),
             validUntil = validUntil,
         ),
     )
@@ -104,6 +107,8 @@ private data class TopListEntry(
     val priceUnit: String? = null,
     val regularPrice: Double? = null,
     val needsLoyaltyCard: Boolean = false,
+    /** A [ProductCategory] name; missing in lists published before categories, which show as OTHER. */
+    val category: String? = null,
     val validUntil: String? = null,
 )
 
