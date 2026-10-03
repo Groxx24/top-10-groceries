@@ -9,6 +9,8 @@ plugins {
     // Reads app/google-services.json (kept out of git) and sets up the default Firebase app.
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
@@ -38,6 +40,9 @@ kotlin {
             implementation(libs.coil.network.ktor)
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.kotlincrypto.hmac.sha2)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.kotlinx.datetime)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
@@ -47,6 +52,10 @@ kotlin {
             implementation(libs.firebase.crashlytics)
         }
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 compose.resources {
@@ -79,6 +88,8 @@ android {
 }
 
 dependencies {
+    // Room generates code per target, so its compiler is added to each one.
+    add("kspAndroid", libs.androidx.room.compiler)
     debugImplementation(libs.compose.ui.tooling)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

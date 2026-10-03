@@ -17,6 +17,12 @@ crashlyticsPlugin = "3.0.8"
 firebaseBom = "34.18.0"
 # Kotlin Multiplatform wrapper around the Firebase SDKs, so the data layer stays in commonMain.
 gitliveFirebase = "2.7.0"
+ksp = "2.2.21-2.0.5"
+# Calendar dates in common code, for when a cached top list's deals end.
+datetime = "0.7.1"
+# Room (multiplatform) caches the top lists read from Firestore.
+room = "2.8.4"
+sqlite = "2.6.2"
 # Multiplatform HMAC-SHA256, for checking the debug passphrase in common code.
 kotlincrypto = "0.8.0"
 
@@ -42,6 +48,10 @@ coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", v
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 gitlive-firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "gitliveFirebase" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+androidx-sqlite-bundled = { group = "androidx.sqlite", name = "sqlite-bundled", version.ref = "sqlite" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "datetime" }
 kotlincrypto-hmac-sha2 = { group = "org.kotlincrypto.macs", name = "hmac-sha2", version.ref = "kotlincrypto" }
 
 [plugins]
@@ -52,3 +62,5 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlyticsPlugin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }

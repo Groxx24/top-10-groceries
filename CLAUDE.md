@@ -16,7 +16,8 @@ UI (Compose)  →  ViewModel  →  Use case  →  Repository interface (domain) 
 
 Dependencies point inward only: `ui` → `domain` ← `data`. `domain` is plain Kotlin. Shared code
 goes in `app/src/commonMain` and must not use `java.*` or `android.*`; `androidMain` holds only
-`MainActivity`, the application class, the manifest and launcher resources. Dependencies are
+`MainActivity`, the application class, the Room database builder (it needs a `Context`), the
+manifest and launcher resources. Dependencies are
 wired by hand in `di/AppContainer.kt` and nowhere else.
 
 ## Screens
@@ -72,6 +73,17 @@ prints both); English is always translated. Submitting publishes all three.
   only the fields the pick screen shows; `name`, `packageSize` and `label` are `{en, fr, nl}`
   maps, and `category` is a `ProductCategory` name (missing or unknown reads as `OTHER`, so never
   rename an entry). A store with no document shows the empty state.
+- Top lists are cached on the phone in Room (multiplatform, set up like the other apps):
+  `data/local/CachedTopLists` wraps `FirestoreTopLists` as both interfaces and keeps each store's
+  offers in `top-lists.db` (`top_offers`, plus `top_lists` with when each was fetched and when it
+  ends). A cached list is used until the first of its deals has ended: its `validUntil` ("07/10",
+  read by `data/local/DueDate.kt` in Brussels time, through that day). The next open deletes it and
+  reads Firestore again, so ended deals are never shown, even offline. A list with no readable end
+  (a store with no list, or no `validUntil`) is read again after `CachedTopLists.MAX_AGE` (12
+  hours). When Firestore fails, a copy that has not ended is shown instead of an error, and a
+  submit writes the new list straight into the cache. Other phones only see a resubmitted list
+  once their copy has ended. The database is only a cache, so a schema change drops it (no migrations); its schema is
+  still exported to `app/schemas/`, which is committed.
 - `DebugLock` guards the debug screens. `data/lock/HashedDebugLock` holds only a salt and a
   PBKDF2-SHA256 hash of the passphrase (`data/lock/DebugPassphrase.kt`, 100,000 iterations, via
   `org.kotlincrypto.macs:hmac-sha2` because common code has no `java.security`). Change the
