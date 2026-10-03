@@ -22,6 +22,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -38,6 +39,7 @@ import coil3.compose.AsyncImage
 import com.top10.products.di.AppContainer
 import com.top10.products.domain.model.Store
 import com.top10.products.resources.Res
+import com.top10.products.resources.debug_title
 import com.top10.products.resources.error_hint
 import com.top10.products.resources.loading
 import com.top10.products.resources.retry
@@ -51,10 +53,19 @@ import com.top10.products.ui.Message
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun StoresRoute(container: AppContainer, onOpenStore: (storeId: String) -> Unit) {
+fun StoresRoute(
+    container: AppContainer,
+    onOpenStore: (storeId: String) -> Unit,
+    onOpenDebug: (() -> Unit)?,
+) {
     val viewModel = viewModel { StoresViewModel(container.getStores) }
     val state by viewModel.state.collectAsStateWithLifecycle()
-    StoresScreen(state = state, onRetry = viewModel::onRetry, onOpenStore = onOpenStore)
+    StoresScreen(
+        state = state,
+        onRetry = viewModel::onRetry,
+        onOpenStore = onOpenStore,
+        onOpenDebug = onOpenDebug,
+    )
 }
 
 @Composable
@@ -62,10 +73,15 @@ fun StoresScreen(
     state: StoresUiState,
     onRetry: () -> Unit,
     onOpenStore: (storeId: String) -> Unit,
+    /** Null hides the entry point, which only debug builds show. */
+    onOpenDebug: (() -> Unit)? = null,
 ) {
     Scaffold { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            Header(Modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp))
+            Header(
+                onOpenDebug = onOpenDebug,
+                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
+            )
             HorizontalDivider()
             Box(Modifier.weight(1f)) {
                 when {
@@ -104,13 +120,19 @@ fun StoresScreen(
 
 /** The app's name and what it does, above the list. */
 @Composable
-private fun Header(modifier: Modifier = Modifier) {
+private fun Header(onOpenDebug: (() -> Unit)?, modifier: Modifier = Modifier) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(
-            text = stringResource(Res.string.stores_title),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = stringResource(Res.string.stores_title),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+            )
+            if (onOpenDebug != null) {
+                TextButton(onClick = onOpenDebug) { Text(stringResource(Res.string.debug_title)) }
+            }
+        }
         Text(
             text = stringResource(Res.string.stores_hint),
             style = MaterialTheme.typography.bodyLarge,

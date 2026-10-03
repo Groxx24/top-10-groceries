@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setContent {
-            App(container)
+            App(container, isDebugBuild = BuildConfig.DEBUG)
         }
     }
 }

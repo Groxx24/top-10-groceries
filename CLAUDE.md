@@ -24,7 +24,11 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
 - `ui/stores/`: the entry point, a list of stores from `GetStoresUseCase`.
 - `ui/top/`: the top list of one store, opened with its `storeId` and loaded through
   `GetTopOffersUseCase(storeId)`. Nothing in the UI or domain is specific to a store.
-- Navigation is a single `rememberSaveable` store id in `ui/App.kt`; back goes to the store list.
+- `ui/debug/`: a debug-only screen (blank for now), opened from a "Debug" button in the store
+  list header. `MainActivity` passes `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is
+  false the button is not shown and the screen cannot be reached.
+- Navigation is a `rememberSaveable` store id plus a debug-screen flag in `ui/App.kt`; back goes
+  to the store list.
 
 ## Data
 

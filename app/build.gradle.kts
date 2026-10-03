@@ -65,6 +65,11 @@ android {
         versionName = "1.0"
     }
 
+    buildFeatures {
+        // BuildConfig.DEBUG decides whether the debug screen can be reached.
+        buildConfig = true
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

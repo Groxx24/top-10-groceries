@@ -14,17 +14,32 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import com.top10.products.di.AppContainer
+import com.top10.products.ui.debug.DebugScreen
 import com.top10.products.ui.stores.StoresRoute
 import com.top10.products.ui.top.TopOffersRoute
 
-/** Two screens: the store list, and the top list of the store picked there. */
+/**
+ * Two screens: the store list, and the top list of the store picked there. Debug builds
+ * ([isDebugBuild]) add a third, reached from the store list.
+ */
 @Composable
-fun App(container: AppContainer) {
+fun App(container: AppContainer, isDebugBuild: Boolean) {
     MaterialTheme(colorScheme = if (isSystemInDarkTheme()) DarkColors else LightColors) {
         var openStoreId by rememberSaveable { mutableStateOf<String?>(null) }
+        var debugOpen by rememberSaveable { mutableStateOf(false) }
         val storeId = openStoreId
-        if (storeId == null) {
-            StoresRoute(container, onOpenStore = { openStoreId = it })
+        if (isDebugBuild && debugOpen) {
+            NavigationBackHandler(
+                state = rememberNavigationEventState(NavigationEventInfo.None),
+                onBackCompleted = { debugOpen = false },
+            )
+            DebugScreen(onBack = { debugOpen = false })
+        } else if (storeId == null) {
+            StoresRoute(
+                container,
+                onOpenStore = { openStoreId = it },
+                onOpenDebug = if (isDebugBuild) ({ debugOpen = true }) else null,
+            )
         } else {
             NavigationBackHandler(
                 state = rememberNavigationEventState(NavigationEventInfo.None),

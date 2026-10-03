@@ -9,6 +9,8 @@
     <string name="top_title_loading">Top 10</string>
     <string name="back">Back</string>
 
+    <string name="debug_title">Debug</string>
+
     <string name="loading">Loading…</string>
     <string name="error_title">Could not load the offers</string>
     <string name="error_hint">Check the connection and try again.</string>
