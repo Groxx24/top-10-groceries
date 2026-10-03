@@ -2,6 +2,7 @@ package com.top10.products.di
 
 import com.top10.products.data.firebase.FirestoreTopLists
 import com.top10.products.data.hardcoded.HardcodedCatalog
+import com.top10.products.data.lock.HashedDebugLock
 import com.top10.products.data.hardcoded.HardcodedWeeklyDeals
 import com.top10.products.domain.repository.StoreRepository
 import com.top10.products.domain.repository.WeeklyDealsRepository
@@ -9,6 +10,7 @@ import com.top10.products.domain.usecase.GetStoresUseCase
 import com.top10.products.domain.usecase.GetTopOffersUseCase
 import com.top10.products.domain.usecase.GetWeeklyDealsUseCase
 import com.top10.products.domain.usecase.SubmitTopListUseCase
+import com.top10.products.domain.usecase.UnlockDebugUseCase
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
 
@@ -28,4 +30,7 @@ class AppContainer {
     val getTopOffers by lazy { GetTopOffersUseCase(topLists) }
     val getWeeklyDeals = GetWeeklyDealsUseCase(storeRepository, weeklyDealsRepository)
     val submitTopList by lazy { SubmitTopListUseCase(topLists) }
+
+    // The passphrase, hashed, that opens the debug screens on top of the debug-build check.
+    val unlockDebug = UnlockDebugUseCase(HashedDebugLock())
 }

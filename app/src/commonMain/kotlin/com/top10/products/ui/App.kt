@@ -16,13 +16,15 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import com.top10.products.di.AppContainer
 import com.top10.products.ui.debug.DebugRoute
 import com.top10.products.ui.debug.PickTopRoute
+import com.top10.products.ui.debug.UnlockRoute
 import com.top10.products.ui.stores.StoresRoute
 import com.top10.products.ui.top.TopOffersRoute
 
 /**
  * Two screens: the store list, and the top list of the store picked there. Debug builds
  * ([isDebugBuild]) add a store picker, reached from the store list, that leads to picking that
- * store's top 10 from its weekly deals.
+ * store's top 10 from its weekly deals. Those screens also need the passphrase, asked for each
+ * time they are opened.
  */
 @Composable
 fun App(container: AppContainer, isDebugBuild: Boolean) {
@@ -30,20 +32,34 @@ fun App(container: AppContainer, isDebugBuild: Boolean) {
         var openStoreId by rememberSaveable { mutableStateOf<String?>(null) }
         var debugOpen by rememberSaveable { mutableStateOf(false) }
         var debugStoreId by rememberSaveable { mutableStateOf<String?>(null) }
+        // Set by the right passphrase, and cleared on leaving the debug screens so they lock again.
+        var debugUnlocked by rememberSaveable { mutableStateOf(false) }
+        val closeDebug = {
+            debugOpen = false
+            debugUnlocked = false
+            debugStoreId = null
+        }
         val storeId = openStoreId
         val pickStoreId = debugStoreId
-        if (isDebugBuild && debugOpen && pickStoreId != null) {
+        val debugAllowed = isDebugBuild && debugOpen && debugUnlocked
+        if (isDebugBuild && debugOpen && !debugUnlocked) {
+            NavigationBackHandler(
+                state = rememberNavigationEventState(NavigationEventInfo.None),
+                onBackCompleted = closeDebug,
+            )
+            UnlockRoute(container, onUnlocked = { debugUnlocked = true }, onBack = closeDebug)
+        } else if (debugAllowed && pickStoreId != null) {
             NavigationBackHandler(
                 state = rememberNavigationEventState(NavigationEventInfo.None),
                 onBackCompleted = { debugStoreId = null },
             )
             PickTopRoute(container, pickStoreId, onBack = { debugStoreId = null })
-        } else if (isDebugBuild && debugOpen) {
+        } else if (debugAllowed) {
             NavigationBackHandler(
                 state = rememberNavigationEventState(NavigationEventInfo.None),
-                onBackCompleted = { debugOpen = false },
+                onBackCompleted = closeDebug,
             )
-            DebugRoute(container, onBack = { debugOpen = false }, onPickStore = { debugStoreId = it })
+            DebugRoute(container, onBack = closeDebug, onPickStore = { debugStoreId = it })
         } else if (storeId == null) {
             StoresRoute(
                 container,

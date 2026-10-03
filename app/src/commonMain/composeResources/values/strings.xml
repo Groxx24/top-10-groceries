@@ -10,6 +10,11 @@
     <string name="back">Back</string>
 
     <string name="debug_title">Debug</string>
+    <string name="unlock_title">Locked</string>
+    <string name="unlock_hint">Enter the passphrase to pick and publish top lists.</string>
+    <string name="unlock_passphrase">Passphrase</string>
+    <string name="unlock_button">Unlock</string>
+    <string name="unlock_wrong">Wrong passphrase</string>
     <string name="debug_pick_store_title">Pick a store to submit 10 products for</string>
     <string name="debug_pick_top_title">Pick 10 at %1$s</string>
     <string name="debug_pick_top_title_loading">Pick 10</string>

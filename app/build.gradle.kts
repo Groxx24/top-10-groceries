@@ -37,6 +37,7 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
             implementation(libs.gitlive.firebase.firestore)
+            implementation(libs.kotlincrypto.hmac.sha2)
         }
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)

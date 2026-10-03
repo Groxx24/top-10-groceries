@@ -17,6 +17,8 @@ crashlyticsPlugin = "3.0.8"
 firebaseBom = "34.18.0"
 # Kotlin Multiplatform wrapper around the Firebase SDKs, so the data layer stays in commonMain.
 gitliveFirebase = "2.7.0"
+# Multiplatform HMAC-SHA256, for checking the debug passphrase in common code.
+kotlincrypto = "0.8.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -40,6 +42,7 @@ coil-network-ktor = { group = "io.coil-kt.coil3", name = "coil-network-ktor3", v
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 gitlive-firebase-firestore = { group = "dev.gitlive", name = "firebase-firestore", version.ref = "gitliveFirebase" }
+kotlincrypto-hmac-sha2 = { group = "org.kotlincrypto.macs", name = "hmac-sha2", version.ref = "kotlincrypto" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

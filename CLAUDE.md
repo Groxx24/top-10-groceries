@@ -1,8 +1,8 @@
 # Top 10 Products
 
 Shows the ten best offers of the week at a grocery store. The app picks a store, then reads that
-store's top list by its id; it does no ranking itself. The lists are made by a separate master app
-and will be published to Firebase. Until then they are hardcoded. Built with Compose
+store's top list from Firestore by its id; it does no ranking itself. The lists are picked and
+published from this same app's debug-only screens. Built with Compose
 Multiplatform, Android target only for now. Single Gradle module `:app`, package
 `com.top10.products`.
 
@@ -31,29 +31,36 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   through `SubmitTopListUseCase`.
   Reached from a "Debug" button in the store list header. `MainActivity` passes
   `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is false the button is not shown and
-  none of these screens can be reached.
-- Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag
-  and the store being picked for. Back goes one screen up.
+  none of these screens can be reached. Even in a debug build they open only after
+  `UnlockScreen` gets the passphrase, asked again each time the debug screens are opened.
+- Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag,
+  whether the debug screens are unlocked, and the store being picked for. Back goes one screen
+  up; leaving the debug screens locks them again.
 
 ## Data
 
-- `Store` is an `id` and a display `name`. `Offer` is one already-ranked place in a list (`rank`
-  1 to 10) with its `Deal`: the store's label, the share of the normal price saved, and how many
-  items must be bought.
-- `StoreRepository` and `TopOffersRepository` (`domain/repository/`) are the only way in. Today
-  both are implemented by `data/hardcoded/HardcodedCatalog`, which holds five stores (Delhaize,
-  Aldi, Lidl, Intermarché, Spar), each with ten made-up products. Moving to Firebase means writing Firebase implementations of those two interfaces and
-  swapping them in `AppContainer`; nothing above the data layer changes.
+- `Store` is an `id`, a display `name` and a logo. `WeeklyDeal` is a promotion as a store's folder
+  prints it; `Offer` is one already-ranked place in a published list (`rank` 1 to 10) holding
+  its `WeeklyDeal`, and `ui/deal/DealInfo` draws a deal the same way on both screens.
+- `StoreRepository` is implemented by `data/hardcoded/HardcodedCatalog`: five stores (Delhaize,
+  Aldi, Lidl, Intermarché, Spar). Moving the stores to Firebase means a Firebase implementation
+  swapped in `AppContainer`; nothing above the data layer changes.
 - `WeeklyDealsRepository` gives a store's deals of the week, most relevant first; the debug flow
   offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` is typed in by
   hand for week 40 of 2026: Delhaize's from its own folder (the PDF behind folder-fr.delhaize.be),
   the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
   the sites showed fewer than 20. Scraping would replace it.
-- `TopListPublisher` publishes a store's top list. `data/firebase/FirestoreTopListPublisher`
-  writes it to `topLists/{storeId}`, one document per store replaced on each submit: `storeId`,
-  `storeName`, a server `submittedAt`, and `offers`, the 10 picks in the order they were listed
-  (`rank` 1 to 10) with only the fields the pick screen shows. It calls the `set` overload that
-  takes a serializer: GitLive's inline overloads are built for JVM 17 and the app targets 11.
+- Top lists are in Firestore. `data/firebase/FirestoreTopLists` is both the `TopOffersRepository`
+  the app reads and the `TopListPublisher` the debug screen writes: `topLists/{storeId}`, one
+  document per store replaced on each submit, with `storeId`, `storeName`, a server
+  `submittedAt`, and `offers`, the 10 picks in the order they were listed (`rank` 1 to 10) with
+  only the fields the pick screen shows. A store with no document shows the empty state.
+- `DebugLock` guards the debug screens. `data/lock/HashedDebugLock` holds only a salt and a
+  PBKDF2-SHA256 hash of the passphrase (`data/lock/DebugPassphrase.kt`, 100,000 iterations, via
+  `org.kotlincrypto.macs:hmac-sha2` because common code has no `java.security`). Change the
+  passphrase with `python3 scripts/set-debug-passphrase.py` (or `--generate`), never by editing
+  that file, and never commit the passphrase itself. The lock is in the app only: Firestore's
+  rules cannot see it, so it does not stop someone writing to Firestore without the app.
 - Firebase is set up: the `com.google.gms.google-services` plugin reads `app/google-services.json`
   (gitignored, so every checkout needs its own copy), and Firestore is used through GitLive's
   multiplatform SDK (`dev.gitlive:firebase-firestore`) so the Firebase implementations live in
@@ -72,4 +79,5 @@ export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 ```
 
 Library versions in `gradle/libs.versions.toml` match the other apps here and are pinned for the
-same reason: Android Gradle Plugin 8.13 and compile SDK 36.
+same reason: Android Gradle Plugin 8.13 and compile SDK 36. Unlike the other apps, this one
+targets JVM 17, because GitLive's inline Firestore functions are built for 17.
