@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -25,11 +26,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil3.compose.AsyncImage
 import com.top10.products.di.AppContainer
 import com.top10.products.domain.model.Store
 import com.top10.products.resources.Res
@@ -122,19 +127,7 @@ private fun StoreCard(store: Store, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text(
-                    text = store.name.take(1).uppercase(),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            }
+            StoreLogo(store)
             Column(Modifier.weight(1f)) {
                 Text(
                     text = store.name,
@@ -153,6 +146,37 @@ private fun StoreCard(store: Store, onClick: () -> Unit) {
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp).rotate(180f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun StoreLogo(store: Store) {
+    if (store.logoUrl != null) {
+        // Logos are drawn for a white background, so the tile stays white in the dark theme too.
+        AsyncImage(
+            model = store.logoUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(width = 72.dp, height = 48.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color.White)
+                .padding(6.dp),
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(
+                text = store.name.take(1).uppercase(),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
     }

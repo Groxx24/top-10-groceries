@@ -4,4 +4,6 @@ package com.top10.products.domain.model
 data class Store(
     val id: String,
     val name: String,
+    /** The store's logo, if there is one; the list shows the name's first letter otherwise. */
+    val logoUrl: String? = null,
 )
