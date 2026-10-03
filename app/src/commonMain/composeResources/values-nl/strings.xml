@@ -1,0 +1,39 @@
+<resources>
+    <string name="stores_title">Top 10 Producten</string>
+    <string name="stores_hint">Kies een winkel om de tien beste aanbiedingen van deze week te zien.</string>
+    <string name="stores_section">Winkels</string>
+    <string name="stores_card_hint">Bekijk de top 10 van deze week</string>
+    <string name="stores_error_title">De winkels konden niet worden geladen</string>
+
+    <string name="top_title">Top 10 bij %1$s</string>
+    <string name="top_title_loading">Top 10</string>
+    <string name="back">Terug</string>
+
+    <string name="debug_title">Debug</string>
+    <string name="unlock_title">Vergrendeld</string>
+    <string name="unlock_hint">Voer de wachtzin in om toplijsten te kiezen en te publiceren.</string>
+    <string name="unlock_passphrase">Wachtzin</string>
+    <string name="unlock_button">Ontgrendelen</string>
+    <string name="unlock_wrong">Verkeerde wachtzin</string>
+    <string name="debug_pick_store_title">Kies een winkel om 10 producten voor in te dienen</string>
+    <string name="debug_pick_top_title">Kies 10 bij %1$s</string>
+    <string name="debug_pick_top_title_loading">Kies 10</string>
+    <string name="debug_deals_error_title">De promoties konden niet worden geladen</string>
+    <string name="debug_selected_count">%1$d van %2$d geselecteerd</string>
+    <string name="debug_submit">Lijst indienen</string>
+    <string name="debug_submitted">Toplijst gepubliceerd</string>
+    <string name="debug_submit_failed">De lijst kon niet worden gepubliceerd. Probeer het opnieuw.</string>
+
+    <string name="loading">Laden…</string>
+    <string name="error_title">De aanbiedingen konden niet worden geladen</string>
+    <string name="error_hint">Controleer de verbinding en probeer het opnieuw.</string>
+    <string name="retry">Opnieuw proberen</string>
+    <string name="empty_title">Niets deze week</string>
+    <string name="empty_hint">%1$s heeft nog geen toplijst voor deze week.</string>
+
+    <string name="deal_percent_minus">-%1$d%</string>
+    <string name="deal_price">€ %1$s</string>
+    <string name="decimal_separator">,</string>
+    <string name="deal_valid_until">Tot %1$s</string>
+    <string name="deal_loyalty_card">Klantenkaart nodig</string>
+</resources>

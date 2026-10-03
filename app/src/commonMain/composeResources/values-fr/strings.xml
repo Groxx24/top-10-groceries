@@ -1,0 +1,39 @@
+<resources>
+    <string name="stores_title">Top 10 Produits</string>
+    <string name="stores_hint">Choisissez un magasin pour voir les dix meilleures offres de la semaine.</string>
+    <string name="stores_section">Magasins</string>
+    <string name="stores_card_hint">Voir le top 10 de la semaine</string>
+    <string name="stores_error_title">Impossible de charger les magasins</string>
+
+    <string name="top_title">Top 10 chez %1$s</string>
+    <string name="top_title_loading">Top 10</string>
+    <string name="back">Retour</string>
+
+    <string name="debug_title">Débogage</string>
+    <string name="unlock_title">Verrouillé</string>
+    <string name="unlock_hint">Saisissez la phrase secrète pour choisir et publier les tops.</string>
+    <string name="unlock_passphrase">Phrase secrète</string>
+    <string name="unlock_button">Déverrouiller</string>
+    <string name="unlock_wrong">Phrase secrète incorrecte</string>
+    <string name="debug_pick_store_title">Choisissez un magasin pour lequel soumettre 10 produits</string>
+    <string name="debug_pick_top_title">Choisir 10 chez %1$s</string>
+    <string name="debug_pick_top_title_loading">Choisir 10</string>
+    <string name="debug_deals_error_title">Impossible de charger les promotions</string>
+    <string name="debug_selected_count">%1$d sur %2$d sélectionnés</string>
+    <string name="debug_submit">Soumettre la liste</string>
+    <string name="debug_submitted">Top publié</string>
+    <string name="debug_submit_failed">Impossible de publier la liste. Réessayez.</string>
+
+    <string name="loading">Chargement…</string>
+    <string name="error_title">Impossible de charger les offres</string>
+    <string name="error_hint">Vérifiez la connexion et réessayez.</string>
+    <string name="retry">Réessayer</string>
+    <string name="empty_title">Rien cette semaine</string>
+    <string name="empty_hint">%1$s n’a pas encore de top pour cette semaine.</string>
+
+    <string name="deal_percent_minus">-%1$d%</string>
+    <string name="deal_price">%1$s €</string>
+    <string name="decimal_separator">,</string>
+    <string name="deal_valid_until">Jusqu’au %1$s</string>
+    <string name="deal_loyalty_card">Carte de fidélité requise</string>
+</resources>

@@ -23,6 +23,7 @@ import com.top10.products.resources.deal_loyalty_card
 import com.top10.products.resources.deal_percent_minus
 import com.top10.products.resources.deal_price
 import com.top10.products.resources.deal_valid_until
+import com.top10.products.resources.decimal_separator
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
@@ -68,13 +69,15 @@ private fun DealLabel(deal: WeeklyDeal) {
 }
 
 /**
- * "~~€6.18~~ €3.09 /2 · Until 07/10 · Loyalty card needed", with only what the folder gives. The
- * deal price is in red; the original price before it is struck through.
+ * "~~€6.18~~ €3.09 /2 · Until 07/10 · Loyalty card needed" (in French "~~6,18 €~~ 3,09 € /2 · …"),
+ * with only what the folder gives. The deal price is in red; the original price before it is
+ * struck through.
  */
 @Composable
 private fun DealDetails(deal: WeeklyDeal) {
-    val regularPrice = deal.regularPrice?.let { stringResource(Res.string.deal_price, formatEuros(it)) }
-    val price = deal.price?.let { stringResource(Res.string.deal_price, formatEuros(it)) }
+    val separator = stringResource(Res.string.decimal_separator)
+    val regularPrice = deal.regularPrice?.let { stringResource(Res.string.deal_price, formatEuros(it, separator)) }
+    val price = deal.price?.let { stringResource(Res.string.deal_price, formatEuros(it, separator)) }
     val rest = listOfNotNull(
         deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
         if (deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
@@ -100,8 +103,8 @@ private fun DealDetails(deal: WeeklyDeal) {
     )
 }
 
-/** 5.853 becomes "5.85". Common code has no number formatter. */
-internal fun formatEuros(amount: Double): String {
+/** 5.853 becomes "5.85", or "5,85" with a comma [decimalSeparator]. Common code has no number formatter. */
+internal fun formatEuros(amount: Double, decimalSeparator: String = "."): String {
     val cents = (amount * 100).roundToInt()
-    return "${cents / 100}.${(cents % 100).toString().padStart(2, '0')}"
+    return "${cents / 100}$decimalSeparator${(cents % 100).toString().padStart(2, '0')}"
 }

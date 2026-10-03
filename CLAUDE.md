@@ -37,6 +37,15 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   whether the debug screens are unlocked, and the store being picked for. Back goes one screen
   up; leaving the debug screens locks them again.
 
+## Languages
+
+The app is for Belgium: English (`composeResources/values/`, the fallback), French
+(`values-fr/`) and Dutch (`values-nl/`, written for Flanders), chosen from the phone's language.
+Every string goes in all three files with the same keys. Prices follow each language's format
+through `deal_price` and `decimal_separator` (`€3.09`, `3,09 €`, `€ 3,09`), so never build a price
+string in code. The launcher name is `app_name` in `androidMain/res/values{,-fr,-nl}/`.
+Product names and deal labels are data and stay as the store printed them.
+
 ## Data
 
 - `Store` is an `id`, a display `name` and a logo. `WeeklyDeal` is a promotion as a store's folder

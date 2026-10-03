@@ -33,6 +33,8 @@
 
     <string name="deal_percent_minus">-%1$d%</string>
     <string name="deal_price">€%1$s</string>
+    <!-- Between euros and cents; Belgian French and Dutch use a comma. -->
+    <string name="decimal_separator">.</string>
     <string name="deal_valid_until">Until %1$s</string>
     <string name="deal_loyalty_card">Loyalty card needed</string>
 </resources>
