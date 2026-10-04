@@ -17,7 +17,8 @@
             android:value="ca-app-pub-4164526058911953~7723978662" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Top10Deals.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

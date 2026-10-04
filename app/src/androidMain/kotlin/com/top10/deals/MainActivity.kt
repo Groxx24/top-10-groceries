@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.top10.deals.ads.AdsConsent
 import com.top10.deals.ads.StoresBanner
 import com.top10.deals.ui.App
@@ -15,6 +16,7 @@ class MainActivity : ComponentActivity() {
     private val adsConsent by lazy { AdsConsent(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         adsConsent.gather()

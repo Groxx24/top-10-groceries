@@ -46,7 +46,9 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   to Material's purple baseline. Screens use `MaterialTheme.colorScheme` roles, never fixed
   colours, except for what must look the same in both (white logo tiles, medal badges, the
   translucent category tints in `DealPicture`). The pre-Compose window background in
-  `androidMain/res/values{,-night}/colors.xml` matches each scheme's `background`.
+  `androidMain/res/values{,-night}/colors.xml` matches each scheme's `background`. Before that,
+  the launch screen (`androidx.core:core-splashscreen`, `Theme.Top10Deals.Starting` on
+  `MainActivity`) shows the launcher icon's badge on `splash_background`, green in both themes.
 - Ads (AdMob, Android only): an anchored adaptive banner under the store list, and nowhere else.
   `ads/StoresBanner` and `ads/AdsConsent` live in `androidMain`; `MainActivity` hands them to
   `App` as a `storesBanner` slot and an `onOpenPrivacyOptions` callback, so common code knows

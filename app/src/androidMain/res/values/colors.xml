@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="window_background">#FFF7FAF4</color>
+    <!-- The launch screen, green in both themes like the launcher icon behind the badge. -->
+    <color name="splash_background">#FF2E6B3A</color>
 </resources>
