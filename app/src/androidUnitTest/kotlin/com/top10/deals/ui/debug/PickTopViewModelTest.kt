@@ -76,19 +76,31 @@ class PickTopViewModelTest {
     }
 
     @Test
-    fun `submit publishes the 10 picks in the order they are listed`() {
+    fun `submit publishes the 10 picks in the order they were picked`() {
         val publisher = FakePublisher()
         val viewModel = viewModel(publisher)
-        val ids = viewModel.dealIds
-        ids.take(TOP_LIST_SIZE).reversed().forEach(viewModel::onToggle)
+        val picked = viewModel.dealIds.take(TOP_LIST_SIZE).reversed()
+        picked.forEach(viewModel::onToggle)
 
         viewModel.onSubmit()
 
         val top = publisher.published!!
         assertEquals("delhaize", top.store.id)
-        assertEquals(ids.take(TOP_LIST_SIZE), top.offers.map { it.deal.id })
+        assertEquals(picked, top.offers.map { it.deal.id })
         assertEquals((1..TOP_LIST_SIZE).toList(), top.offers.map { it.rank })
         assertEquals(SubmitStatus.Submitted, viewModel.state.value.submit)
+    }
+
+    @Test
+    fun `unpicking one moves the ones picked after it up a place`() {
+        val viewModel = viewModel(FakePublisher())
+        val (first, second, third) = viewModel.dealIds
+        listOf(third, first, second).forEach(viewModel::onToggle)
+
+        viewModel.onToggle(first)
+        assertEquals(listOf(third, second), viewModel.state.value.selectedIds)
+        viewModel.onToggle(first)
+        assertEquals(listOf(third, second, first), viewModel.state.value.selectedIds)
     }
 
     @Test

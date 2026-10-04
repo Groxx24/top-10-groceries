@@ -29,8 +29,10 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   list, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
   candidate deals from `GetWeeklyDealsUseCase(storeId)` (deals already ended are dropped and the
   next ones take their place; under 10 left, the screen says so instead), a multi-select capped at exactly
-  `TOP_LIST_SIZE` (10), and a "Submit list" button enabled only at 10 that publishes the picks
-  through `SubmitTopListUseCase`. Below the store picker, "Delete ended lists" (after a confirm
+  `TOP_LIST_SIZE` (10) that keeps the order of the taps (the first one picked is number 1, shown as
+  the rank badge on each picked deal's picture; unpicking one moves the later ones up), and a
+  "Submit list" button enabled only at 10 that publishes the picks in that order through
+  `SubmitTopListUseCase`. Below the store picker, "Delete ended lists" (after a confirm
   dialog) runs `DeleteEndedTopListsUseCase`: it reads every document in `topLists` through
   `PublishedTopLists` and deletes, one by one, each list that has ended (see
   `domain/model/TopListEnd.kt`), then names the stores it deleted.
@@ -99,7 +101,7 @@ prints both); English is always translated. Submitting publishes all three.
   the app reads and the `TopListPublisher` and `PublishedTopLists` the debug screen writes and
   cleans up: `topLists/{storeId}`, one
   document per store replaced on each submit, with `storeId`, `storeName`, a server
-  `submittedAt`, and `offers`, the 10 picks in the order they were listed (`rank` 1 to 10) with
+  `submittedAt`, and `offers`, the 10 picks in the order they were picked (`rank` 1 to 10) with
   only the fields the pick screen shows; `name`, `packageSize` and `label` are `{en, fr, nl}`
   maps, `category` is a `ProductCategory` name (missing or unknown reads as `OTHER`, so never
   rename an entry), and `product` a `GenericProduct` name (missing or unknown shows the category

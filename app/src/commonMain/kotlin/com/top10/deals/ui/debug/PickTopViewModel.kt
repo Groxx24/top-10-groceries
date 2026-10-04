@@ -17,8 +17,8 @@ data class PickTopUiState(
     val isLoading: Boolean = true,
     val candidates: WeeklyDeals? = null,
     val loadFailed: Boolean = false,
-    /** Ids of the picked deals. Never more than [TOP_LIST_SIZE]. */
-    val selectedIds: Set<String> = emptySet(),
+    /** Ids of the picked deals in the order they were picked, which is their rank. Never more than [TOP_LIST_SIZE]. */
+    val selectedIds: List<String> = emptyList(),
     val submit: SubmitStatus = SubmitStatus.Idle,
 ) {
     val isFull: Boolean get() = selectedIds.size >= TOP_LIST_SIZE
@@ -47,7 +47,10 @@ class PickTopViewModel(
         if (!_state.value.isLoading) load()
     }
 
-    /** Picks or unpicks a deal. Once [TOP_LIST_SIZE] are picked, another one has to be unpicked first. */
+    /**
+     * Picks a deal as the next place in the list, or unpicks it, moving the ones picked after it up a
+     * place. Once [TOP_LIST_SIZE] are picked, another one has to be unpicked first.
+     */
     fun onToggle(dealId: String) {
         _state.update { state ->
             when {
@@ -58,12 +61,13 @@ class PickTopViewModel(
         }
     }
 
-    /** Publishes the picked deals as the store's top list, in the order the candidates are listed. */
+    /** Publishes the picked deals as the store's top list, in the order they were picked: the first is number 1. */
     fun onSubmit() {
         val state = _state.value
         val candidates = state.candidates ?: return
         if (!state.canSubmit) return
-        val picked = candidates.deals.filter { it.id in state.selectedIds }
+        val dealsById = candidates.deals.associateBy { it.id }
+        val picked = state.selectedIds.map { dealsById.getValue(it) }
         _state.update { it.copy(submit = SubmitStatus.Submitting) }
         viewModelScope.launch {
             val status = try {

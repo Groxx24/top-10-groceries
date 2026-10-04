@@ -130,11 +130,11 @@ private fun SubmitResultSnackbar(submit: SubmitStatus, snackbarHostState: Snackb
     }
 }
 
-/** The deals to pick from; once [isFull], only the picked ones can be changed. */
+/** The deals to pick from, each picked one with the place it will have; once [isFull], only the picked ones can be changed. */
 @Composable
 private fun CandidateList(
     deals: List<WeeklyDeal>,
-    selectedIds: Set<String>,
+    selectedIds: List<String>,
     isFull: Boolean,
     onToggle: (dealId: String) -> Unit,
 ) {
@@ -143,10 +143,11 @@ private fun CandidateList(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         items(deals, key = { it.id }) { deal ->
-            val selected = deal.id in selectedIds
+            val place = selectedIds.indexOf(deal.id).takeIf { it >= 0 }?.plus(1)
+            val selected = place != null
             DealRow(
                 deal = deal,
-                selected = selected,
+                place = place,
                 enabled = selected || !isFull,
                 onToggle = { onToggle(deal.id) },
             )
@@ -154,17 +155,20 @@ private fun CandidateList(
     }
 }
 
-/** One candidate. Once the list is full, the ones not picked are [enabled] = false. */
+/**
+ * One candidate, with its [place] in the top list as the picture's badge when it is picked (null
+ * when it is not). Once the list is full, the ones not picked are [enabled] = false.
+ */
 @Composable
-private fun DealRow(deal: WeeklyDeal, selected: Boolean, enabled: Boolean, onToggle: () -> Unit) {
+private fun DealRow(deal: WeeklyDeal, place: Int?, enabled: Boolean, onToggle: () -> Unit) {
     ElevatedCard(onClick = onToggle, enabled = enabled, modifier = Modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.padding(start = 4.dp, end = 16.dp, top = 12.dp, bottom = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Checkbox(checked = selected, onCheckedChange = { onToggle() }, enabled = enabled)
-            DealPicture(deal)
+            Checkbox(checked = place != null, onCheckedChange = { onToggle() }, enabled = enabled)
+            DealPicture(deal, rank = place)
             DealInfo(deal, Modifier.weight(1f))
         }
     }
