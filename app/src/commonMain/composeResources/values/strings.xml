@@ -23,11 +23,20 @@
     <string name="debug_submit">Submit list</string>
     <string name="debug_submitted">Top list published</string>
     <string name="debug_submit_failed">Could not publish the list. Try again.</string>
+    <string name="debug_delete_ended">Delete ended lists</string>
+    <string name="debug_delete_ended_hint">Removes from Firestore every top list whose deals are over.</string>
+    <string name="debug_delete_ended_confirm_title">Delete ended lists?</string>
+    <string name="debug_delete_ended_confirm_hint">Every published top list whose first deal has ended is deleted from Firestore. This cannot be undone.</string>
+    <string name="debug_delete_ended_confirm">Delete</string>
+    <string name="debug_deleted_ended">Deleted: %1$s</string>
+    <string name="debug_delete_ended_none">No list has ended</string>
+    <string name="debug_delete_ended_failed">Could not delete the ended lists. Try again.</string>
 
     <string name="loading">Loading…</string>
     <string name="error_title">Could not load the offers</string>
     <string name="error_hint">Check the connection and try again.</string>
     <string name="retry">Try again</string>
+    <string name="cancel">Cancel</string>
     <string name="empty_title">Nothing this week</string>
     <string name="empty_hint">%1$s has no top list for this week yet.</string>
 

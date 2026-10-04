@@ -23,11 +23,20 @@
     <string name="debug_submit">Lijst indienen</string>
     <string name="debug_submitted">Toplijst gepubliceerd</string>
     <string name="debug_submit_failed">De lijst kon niet worden gepubliceerd. Probeer het opnieuw.</string>
+    <string name="debug_delete_ended">Afgelopen toplijsten verwijderen</string>
+    <string name="debug_delete_ended_hint">Verwijdert uit Firestore elke toplijst waarvan de promoties voorbij zijn.</string>
+    <string name="debug_delete_ended_confirm_title">Afgelopen toplijsten verwijderen?</string>
+    <string name="debug_delete_ended_confirm_hint">Elke gepubliceerde toplijst waarvan de eerste promotie voorbij is, wordt uit Firestore verwijderd. Dit kan niet ongedaan worden gemaakt.</string>
+    <string name="debug_delete_ended_confirm">Verwijderen</string>
+    <string name="debug_deleted_ended">Verwijderd: %1$s</string>
+    <string name="debug_delete_ended_none">Er is geen toplijst afgelopen</string>
+    <string name="debug_delete_ended_failed">De afgelopen toplijsten konden niet worden verwijderd. Probeer het opnieuw.</string>
 
     <string name="loading">Laden…</string>
     <string name="error_title">De aanbiedingen konden niet worden geladen</string>
     <string name="error_hint">Controleer de verbinding en probeer het opnieuw.</string>
     <string name="retry">Opnieuw proberen</string>
+    <string name="cancel">Annuleren</string>
     <string name="empty_title">Niets deze week</string>
     <string name="empty_hint">%1$s heeft nog geen toplijst voor deze week.</string>
 

@@ -3,8 +3,10 @@ package com.top10.deals.data.firebase
 import com.top10.deals.domain.model.LocalizedText
 import com.top10.deals.domain.model.Offer
 import com.top10.deals.domain.model.ProductCategory
+import com.top10.deals.domain.model.Store
 import com.top10.deals.domain.model.TopOffers
 import com.top10.deals.domain.model.WeeklyDeal
+import com.top10.deals.domain.repository.PublishedTopLists
 import com.top10.deals.domain.repository.StoreRepository
 import com.top10.deals.domain.repository.store
 import com.top10.deals.domain.repository.TopListPublisher
@@ -18,21 +20,33 @@ import kotlinx.serialization.Serializable
  * The stores' top lists in Firestore, one document per store at `topLists/{storeId}`, replaced on
  * every submit. Each entry holds what the pick screen shows for a deal, nothing more, with the
  * name, pack size and label in English, French and Dutch. The store
- * itself comes from [stores], so a store without a document has an empty list.
+ * itself comes from [stores], so a store without a document has an empty list. The debug screen
+ * also reads all of them at once and deletes the ended ones, as [PublishedTopLists].
  */
 class FirestoreTopLists(
     private val firestore: FirebaseFirestore,
     private val stores: StoreRepository,
-) : TopOffersRepository, TopListPublisher {
+) : TopOffersRepository, TopListPublisher, PublishedTopLists {
 
     override suspend fun topOffers(storeId: String): TopOffers {
         val store = stores.store(storeId)
         val snapshot = document(storeId).get()
         if (!snapshot.exists) return TopOffers(store, emptyList())
-        val offers = snapshot.data<TopListDocument>().offers
-            .sortedBy { it.rank }
-            .map { it.toOffer(storeId) }
-        return TopOffers(store, offers)
+        return TopOffers(store, snapshot.data<TopListDocument>().offers(storeId))
+    }
+
+    override suspend fun all(): List<TopOffers> {
+        val known = stores.stores()
+        return firestore.collection(COLLECTION).get().documents.map { snapshot ->
+            val document = snapshot.data<TopListDocument>()
+            // A store no longer in the catalogue still has its list read, so it can be deleted too.
+            val store = known.firstOrNull { it.id == snapshot.id } ?: Store(snapshot.id, document.storeName)
+            TopOffers(store, document.offers(snapshot.id))
+        }
+    }
+
+    override suspend fun delete(storeId: String) {
+        document(storeId).delete()
     }
 
     override suspend fun publish(top: TopOffers) {
@@ -46,6 +60,8 @@ class FirestoreTopLists(
     }
 
     private fun document(storeId: String) = firestore.collection(COLLECTION).document(storeId)
+
+    private fun TopListDocument.offers(storeId: String) = offers.sortedBy { it.rank }.map { it.toOffer(storeId) }
 
     private fun Offer.toEntry() = TopListEntry(
         rank = rank,

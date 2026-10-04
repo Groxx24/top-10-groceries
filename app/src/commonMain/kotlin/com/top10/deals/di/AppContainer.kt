@@ -10,6 +10,7 @@ import com.top10.deals.data.local.TopListDatabase
 import com.top10.deals.data.local.buildTopListDatabase
 import com.top10.deals.domain.repository.StoreRepository
 import com.top10.deals.domain.repository.WeeklyDealsRepository
+import com.top10.deals.domain.usecase.DeleteEndedTopListsUseCase
 import com.top10.deals.domain.usecase.GetStoresUseCase
 import com.top10.deals.domain.usecase.GetTopOffersUseCase
 import com.top10.deals.domain.usecase.GetWeeklyDealsUseCase
@@ -17,6 +18,8 @@ import com.top10.deals.domain.usecase.SubmitTopListUseCase
 import com.top10.deals.domain.usecase.UnlockDebugUseCase
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -49,6 +52,11 @@ class AppContainer(databaseBuilder: RoomDatabase.Builder<TopListDatabase>) {
     val getTopOffers by lazy { GetTopOffersUseCase(topLists) }
     val getWeeklyDeals = GetWeeklyDealsUseCase(storeRepository, weeklyDealsRepository)
     val submitTopList by lazy { SubmitTopListUseCase(topLists) }
+    val deleteEndedTopLists by lazy {
+        DeleteEndedTopListsUseCase(firestoreTopLists) {
+            Clock.System.now().toLocalDateTime(TimeZone.of("Europe/Brussels")).date
+        }
+    }
 
     // The passphrase, hashed, that opens the debug screens on top of the debug-build check.
     val unlockDebug = UnlockDebugUseCase(HashedDebugLock())

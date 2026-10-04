@@ -1,4 +1,4 @@
-package com.top10.deals.data.local
+package com.top10.deals.domain.model
 
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDate

@@ -23,11 +23,20 @@
     <string name="debug_submit">Soumettre la liste</string>
     <string name="debug_submitted">Top publié</string>
     <string name="debug_submit_failed">Impossible de publier la liste. Réessayez.</string>
+    <string name="debug_delete_ended">Supprimer les tops terminés</string>
+    <string name="debug_delete_ended_hint">Retire de Firestore chaque top dont les promotions sont terminées.</string>
+    <string name="debug_delete_ended_confirm_title">Supprimer les tops terminés ?</string>
+    <string name="debug_delete_ended_confirm_hint">Chaque top publié dont la première promotion est terminée est supprimé de Firestore. Impossible d’annuler.</string>
+    <string name="debug_delete_ended_confirm">Supprimer</string>
+    <string name="debug_deleted_ended">Supprimés : %1$s</string>
+    <string name="debug_delete_ended_none">Aucun top n’est terminé</string>
+    <string name="debug_delete_ended_failed">Impossible de supprimer les tops terminés. Réessayez.</string>
 
     <string name="loading">Chargement…</string>
     <string name="error_title">Impossible de charger les offres</string>
     <string name="error_hint">Vérifiez la connexion et réessayez.</string>
     <string name="retry">Réessayer</string>
+    <string name="cancel">Annuler</string>
     <string name="empty_title">Rien cette semaine</string>
     <string name="empty_hint">%1$s n’a pas encore de top pour cette semaine.</string>
 

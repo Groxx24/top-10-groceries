@@ -1,4 +1,4 @@
-package com.top10.deals.data.local
+package com.top10.deals.domain.model
 
 import kotlinx.datetime.LocalDate
 import org.junit.Assert.assertEquals

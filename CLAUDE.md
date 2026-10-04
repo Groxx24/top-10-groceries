@@ -29,7 +29,10 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   list, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
   candidate deals from `GetWeeklyDealsUseCase(storeId)`, a multi-select capped at exactly
   `TOP_LIST_SIZE` (10), and a "Submit list" button enabled only at 10 that publishes the picks
-  through `SubmitTopListUseCase`.
+  through `SubmitTopListUseCase`. Below the store picker, "Delete ended lists" (after a confirm
+  dialog) runs `DeleteEndedTopListsUseCase`: it reads every document in `topLists` through
+  `PublishedTopLists` and deletes, one by one, each list that has ended (see
+  `domain/model/TopListEnd.kt`), then names the stores it deleted.
   Reached from a "Debug" button in the store list header. `MainActivity` passes
   `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is false the button is not shown and
   none of these screens can be reached. Even in a debug build they open only after
@@ -76,7 +79,8 @@ prints both); English is always translated. Submitting publishes all three.
   the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
   the sites showed fewer than 20. Scraping would replace it.
 - Top lists are in Firestore. `data/firebase/FirestoreTopLists` is both the `TopOffersRepository`
-  the app reads and the `TopListPublisher` the debug screen writes: `topLists/{storeId}`, one
+  the app reads and the `TopListPublisher` and `PublishedTopLists` the debug screen writes and
+  cleans up: `topLists/{storeId}`, one
   document per store replaced on each submit, with `storeId`, `storeName`, a server
   `submittedAt`, and `offers`, the 10 picks in the order they were listed (`rank` 1 to 10) with
   only the fields the pick screen shows; `name`, `packageSize` and `label` are `{en, fr, nl}`
@@ -86,7 +90,7 @@ prints both); English is always translated. Submitting publishes all three.
   `data/local/CachedTopLists` wraps `FirestoreTopLists` as both interfaces and keeps each store's
   offers in `top-lists.db` (`top_offers`, plus `top_lists` with when each was fetched and when it
   ends). A cached list is used until the first of its deals has ended: its `validUntil` ("07/10",
-  read by `data/local/DueDate.kt` in Brussels time, through that day), and Firestore is not read
+  read by `domain/model/DueDate.kt` in Brussels time, through that day), and Firestore is not read
   again before then. A list in Firestore that has already ended that way shows the empty state and
   is not cached; the app never deletes it, the admin replaces or deletes it. The next open deletes it and
   reads Firestore again, so ended deals are never shown, even offline. A list with no readable

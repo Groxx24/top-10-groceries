@@ -4,6 +4,8 @@ import com.top10.deals.domain.model.Offer
 import com.top10.deals.domain.model.ProductCategory
 import com.top10.deals.domain.model.TopOffers
 import com.top10.deals.domain.model.WeeklyDeal
+import com.top10.deals.domain.model.hasEnded
+import com.top10.deals.domain.model.lastDay
 import com.top10.deals.domain.repository.StoreRepository
 import com.top10.deals.domain.repository.store
 import com.top10.deals.domain.repository.TopListPublisher
@@ -55,7 +57,7 @@ class CachedTopLists(
             return TopOffers(store, cachedOffers(storeId))
         }
         // An ended list still in Firestore is not shown; the admin deletes or replaces it.
-        val shown = if (hasEnded(expiryDay(top.offers))) TopOffers(store, emptyList()) else top
+        val shown = if (top.hasEnded(today())) TopOffers(store, emptyList()) else top
         save(shown)
         return shown
     }
@@ -71,7 +73,9 @@ class CachedTopLists(
             dao.delete(top.store.id)
             return
         }
-        val list = CachedTopListEntity(top.store.id, now(), expiryDay(top.offers)?.toEpochDays())
+        // Kept through the last day of the list, so it ends the day after.
+        val expiresOn = top.lastDay(today())?.plus(1, DateTimeUnit.DAY)
+        val list = CachedTopListEntity(top.store.id, now(), expiresOn?.toEpochDays())
         dao.replace(list, top.offers.map { it.toEntity(top.store.id) })
     }
 
@@ -91,20 +95,9 @@ class CachedTopLists(
         return today().toEpochDays() >= expiresOn
     }
 
-    private fun hasEnded(expiresOn: LocalDate?): Boolean = expiresOn != null && today() >= expiresOn
-
     /** A list with an end is used until then; one without, for [maxAge] after it was fetched. */
     private fun isFresh(list: CachedTopListEntity): Boolean =
         list.expiresOnEpochDay != null || now() - list.fetchedAtMillis in 0 until maxAge.inWholeMilliseconds
-
-    /** The day after the first deal ends; deals whose end cannot be read do not count. */
-    private fun expiryDay(offers: List<Offer>): LocalDate? {
-        val today = today()
-        return offers
-            .mapNotNull { offer -> offer.deal.validUntil?.let { dueDate(it, fetchedOn = today) } }
-            .minOrNull()
-            ?.plus(1, DateTimeUnit.DAY)
-    }
 
     private fun today(): LocalDate = Instant.fromEpochMilliseconds(now()).toLocalDateTime(timeZone).date
 
