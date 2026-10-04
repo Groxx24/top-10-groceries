@@ -2,8 +2,10 @@ package com.top10.deals.ui.top
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,7 +32,7 @@ import com.top10.deals.ui.Message
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun TopOffersRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
+fun TopOffersRoute(container: AppContainer, storeId: String, onBack: () -> Unit, banner: @Composable () -> Unit = {}) {
     val viewModel = viewModel(key = storeId) { TopOffersViewModel(storeId, container.getTopOffers) }
     // Every time the screen opens, not only the first: the ViewModel is kept for the whole session.
     LaunchedEffect(viewModel) { viewModel.onOpened() }
@@ -39,6 +41,7 @@ fun TopOffersRoute(container: AppContainer, storeId: String, onBack: () -> Unit)
         state = state,
         onBack = onBack,
         onRetry = viewModel::onRetry,
+        banner = banner,
     )
 }
 
@@ -47,6 +50,8 @@ fun TopOffersScreen(
     state: TopOffersUiState,
     onBack: () -> Unit,
     onRetry: () -> Unit,
+    /** The ad under the list, which comes from the platform. */
+    banner: @Composable () -> Unit = {},
 ) {
     Scaffold(
         topBar = {
@@ -57,14 +62,17 @@ fun TopOffersScreen(
             )
         },
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
-            val top = state.top
-            when {
-                top != null -> OfferList(top)
+        Column(Modifier.fillMaxSize().padding(padding)) {
+            Box(Modifier.fillMaxWidth().weight(1f)) {
+                val top = state.top
+                when {
+                    top != null -> OfferList(top)
 
-                state.loadFailed -> ErrorMessage(stringResource(Res.string.error_title), onRetry)
-                else -> LoadingMessage()
+                    state.loadFailed -> ErrorMessage(stringResource(Res.string.error_title), onRetry)
+                    else -> LoadingMessage()
+                }
             }
+            banner()
         }
     }
 }

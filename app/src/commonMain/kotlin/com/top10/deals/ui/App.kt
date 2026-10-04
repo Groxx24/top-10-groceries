@@ -22,14 +22,15 @@ import com.top10.deals.ui.top.TopOffersRoute
  * store's top 10 from its weekly deals. Those screens also need the passphrase, asked for each
  * time they are opened.
  *
- * Ads come from the platform: [storesBanner] is drawn under the store list, and
- * [onOpenPrivacyOptions], when not null, lets the user change their consent to ads.
+ * Ads come from the platform: [storesBanner] is drawn under the store list, [dealsBanner] under a
+ * store's top list, and [onOpenPrivacyOptions], when not null, lets the user change their consent to ads.
  */
 @Composable
 fun App(
     container: AppContainer,
     isDebugBuild: Boolean,
     storesBanner: @Composable () -> Unit = {},
+    dealsBanner: @Composable () -> Unit = {},
     onOpenPrivacyOptions: (() -> Unit)? = null,
 ) {
     Top10Theme {
@@ -71,7 +72,7 @@ fun App(
 
             is Screen.Top -> {
                 OnBack(closeStore)
-                TopOffersRoute(container, screen.storeId, onBack = closeStore)
+                TopOffersRoute(container, screen.storeId, onBack = closeStore, banner = dealsBanner)
             }
         }
     }

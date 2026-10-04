@@ -51,14 +51,15 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   `androidMain/res/values{,-night}/colors.xml` matches each scheme's `background`. Before that,
   the launch screen (`androidx.core:core-splashscreen`, `Theme.Top10Deals.Starting` on
   `MainActivity`) shows the launcher icon's badge on `splash_background`, green in both themes.
-- Ads (AdMob, Android only): an anchored adaptive banner under the store list, and nowhere else.
-  `ads/StoresBanner` and `ads/AdsConsent` live in `androidMain`; `MainActivity` hands them to
-  `App` as a `storesBanner` slot and an `onOpenPrivacyOptions` callback, so common code knows
-  nothing of AdMob. Belgium is in the EEA, so `AdsConsent` runs Google's UMP consent form on every
+- Ads (AdMob, Android only): an anchored adaptive banner under the store list and another under a
+  store's top 10, each its own ad unit, and nowhere else. `ads/Banners.kt` (`StoresBanner`,
+  `DealsBanner`) and `ads/AdsConsent` live in `androidMain`; `MainActivity` hands them to `App` as
+  `storesBanner` and `dealsBanner` slots and an `onOpenPrivacyOptions` callback, so common code
+  knows nothing of AdMob. Belgium is in the EEA, so `AdsConsent` runs Google's UMP consent form on every
   start and starts the Mobile Ads SDK only once `canRequestAds()`; until then no banner is drawn.
   When UMP says privacy options are required, a "Privacy" button in the store list header reopens
-  the form. The AdMob app id is in the manifest; the banner's unit id is in `StoresBanner`, and
-  debug builds use Google's test unit instead so our own taps never count.
+  the form. The AdMob app id is in the manifest; the banners' unit ids are in `Banners.kt`,
+  and debug builds use Google's test unit instead so our own taps never count.
 - Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag,
   whether the debug screens are unlocked, and the store being picked for. Back goes one screen
   up; leaving the debug screens locks them again.

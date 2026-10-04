@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.top10.deals.ads.AdsConsent
+import com.top10.deals.ads.DealsBanner
 import com.top10.deals.ads.StoresBanner
 import com.top10.deals.ui.App
 
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                 container,
                 isDebugBuild = BuildConfig.DEBUG,
                 storesBanner = { if (adsConsent.canRequestAds) StoresBanner() },
+                dealsBanner = { if (adsConsent.canRequestAds) DealsBanner() },
                 onOpenPrivacyOptions = if (adsConsent.privacyOptionsRequired) adsConsent::showPrivacyOptions else null,
             )
         }
