@@ -86,7 +86,8 @@ prints both); English is always translated. Submitting publishes all three.
   `data/local/CachedTopLists` wraps `FirestoreTopLists` as both interfaces and keeps each store's
   offers in `top-lists.db` (`top_offers`, plus `top_lists` with when each was fetched and when it
   ends). A cached list is used until the first of its deals has ended: its `validUntil` ("07/10",
-  read by `data/local/DueDate.kt` in Brussels time, through that day). The next open deletes it and
+  read by `data/local/DueDate.kt` in Brussels time, through that day), and Firestore is not read
+  again before then; deals already over when the list is read do not count. The next open deletes it and
   reads Firestore again, so ended deals are never shown, even offline. A list with no readable
   `validUntil` is read again after `CachedTopLists.MAX_AGE` (12 hours). A store with no list
   published is not cached, so it is read from Firestore on every open until one is. When Firestore fails, a copy that has not ended is shown instead of an error, and a
