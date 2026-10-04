@@ -6,6 +6,7 @@ import com.top10.products.domain.model.ProductCategory
 import com.top10.products.domain.model.TopOffers
 import com.top10.products.domain.model.WeeklyDeal
 import com.top10.products.domain.repository.StoreRepository
+import com.top10.products.domain.repository.store
 import com.top10.products.domain.repository.TopListPublisher
 import com.top10.products.domain.repository.TopOffersRepository
 import dev.gitlive.firebase.firestore.BaseTimestamp
@@ -25,7 +26,7 @@ class FirestoreTopLists(
 ) : TopOffersRepository, TopListPublisher {
 
     override suspend fun topOffers(storeId: String): TopOffers {
-        val store = stores.stores().firstOrNull { it.id == storeId } ?: error("Unknown store $storeId")
+        val store = stores.store(storeId)
         val snapshot = document(storeId).get()
         if (!snapshot.exists) return TopOffers(store, emptyList())
         val offers = snapshot.data<TopListDocument>().offers

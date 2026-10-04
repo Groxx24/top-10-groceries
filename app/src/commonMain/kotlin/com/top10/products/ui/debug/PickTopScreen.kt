@@ -15,16 +15,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +34,6 @@ import com.top10.products.di.AppContainer
 import com.top10.products.domain.model.TOP_LIST_SIZE
 import com.top10.products.domain.model.WeeklyDeal
 import com.top10.products.resources.Res
-import com.top10.products.resources.back
 import com.top10.products.resources.debug_deals_error_title
 import com.top10.products.resources.debug_pick_top_title
 import com.top10.products.resources.debug_pick_top_title_loading
@@ -46,11 +41,9 @@ import com.top10.products.resources.debug_selected_count
 import com.top10.products.resources.debug_submit
 import com.top10.products.resources.debug_submit_failed
 import com.top10.products.resources.debug_submitted
-import com.top10.products.resources.error_hint
-import com.top10.products.resources.loading
-import com.top10.products.resources.retry
-import com.top10.products.ui.BackArrow
-import com.top10.products.ui.Message
+import com.top10.products.ui.BackTopBar
+import com.top10.products.ui.ErrorMessage
+import com.top10.products.ui.LoadingMessage
 import com.top10.products.ui.deal.DealInfo
 import com.top10.products.ui.deal.DealPicture
 import org.jetbrains.compose.resources.stringResource
@@ -72,7 +65,6 @@ fun PickTopRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
 }
 
 /** A store's 20 candidate deals; exactly [TOP_LIST_SIZE] of them make its top list. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PickTopScreen(
     state: PickTopUiState,
@@ -83,32 +75,14 @@ fun PickTopScreen(
     onSubmitResultShown: () -> Unit,
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val submittedMessage = stringResource(Res.string.debug_submitted)
-    val submitFailedMessage = stringResource(Res.string.debug_submit_failed)
-    LaunchedEffect(state.submit) {
-        val message = when (state.submit) {
-            SubmitStatus.Submitted -> submittedMessage
-            SubmitStatus.Failed -> submitFailedMessage
-            else -> return@LaunchedEffect
-        }
-        snackbarHostState.showSnackbar(message)
-        onSubmitResultShown()
-    }
+    SubmitResultSnackbar(state.submit, snackbarHostState, onSubmitResultShown)
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        state.candidates?.let { stringResource(Res.string.debug_pick_top_title, it.store.name) }
-                            ?: stringResource(Res.string.debug_pick_top_title_loading),
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(BackArrow, contentDescription = stringResource(Res.string.back))
-                    }
-                },
+            BackTopBar(
+                title = state.candidates?.let { stringResource(Res.string.debug_pick_top_title, it.store.name) }
+                    ?: stringResource(Res.string.debug_pick_top_title_loading),
+                onBack = onBack,
             )
         },
         bottomBar = {
@@ -125,32 +99,50 @@ fun PickTopScreen(
         Box(Modifier.fillMaxSize().padding(padding)) {
             val candidates = state.candidates
             when {
-                candidates != null -> LazyColumn(
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                ) {
-                    items(candidates.deals, key = { it.id }) { deal ->
-                        val selected = deal.id in state.selectedIds
-                        DealRow(
-                            deal = deal,
-                            selected = selected,
-                            enabled = selected || !state.isFull,
-                            onToggle = { onToggle(deal.id) },
-                        )
-                    }
-                }
-
-                state.loadFailed -> Message(
-                    title = stringResource(Res.string.debug_deals_error_title),
-                    hint = stringResource(Res.string.error_hint),
-                ) {
-                    Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-                }
-
-                else -> Message(title = stringResource(Res.string.loading)) {
-                    CircularProgressIndicator()
-                }
+                candidates != null -> CandidateList(candidates.deals, state.selectedIds, state.isFull, onToggle)
+                state.loadFailed -> ErrorMessage(stringResource(Res.string.debug_deals_error_title), onRetry)
+                else -> LoadingMessage()
             }
+        }
+    }
+}
+
+/** Shows how the last submit went, once, then reports it shown through [onShown]. */
+@Composable
+private fun SubmitResultSnackbar(submit: SubmitStatus, snackbarHostState: SnackbarHostState, onShown: () -> Unit) {
+    val submittedMessage = stringResource(Res.string.debug_submitted)
+    val submitFailedMessage = stringResource(Res.string.debug_submit_failed)
+    LaunchedEffect(submit) {
+        val message = when (submit) {
+            SubmitStatus.Submitted -> submittedMessage
+            SubmitStatus.Failed -> submitFailedMessage
+            SubmitStatus.Idle, SubmitStatus.Submitting -> return@LaunchedEffect
+        }
+        snackbarHostState.showSnackbar(message)
+        onShown()
+    }
+}
+
+/** The deals to pick from; once [isFull], only the picked ones can be changed. */
+@Composable
+private fun CandidateList(
+    deals: List<WeeklyDeal>,
+    selectedIds: Set<String>,
+    isFull: Boolean,
+    onToggle: (dealId: String) -> Unit,
+) {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        items(deals, key = { it.id }) { deal ->
+            val selected = deal.id in selectedIds
+            DealRow(
+                deal = deal,
+                selected = selected,
+                enabled = selected || !isFull,
+                onToggle = { onToggle(deal.id) },
+            )
         }
     }
 }

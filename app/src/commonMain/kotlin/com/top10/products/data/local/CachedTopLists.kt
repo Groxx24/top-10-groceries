@@ -5,6 +5,7 @@ import com.top10.products.domain.model.ProductCategory
 import com.top10.products.domain.model.TopOffers
 import com.top10.products.domain.model.WeeklyDeal
 import com.top10.products.domain.repository.StoreRepository
+import com.top10.products.domain.repository.store
 import com.top10.products.domain.repository.TopListPublisher
 import com.top10.products.domain.repository.TopOffersRepository
 import kotlinx.coroutines.CancellationException
@@ -40,18 +41,9 @@ class CachedTopLists(
 ) : TopOffersRepository, TopListPublisher {
 
     override suspend fun topOffers(storeId: String): TopOffers {
-        val store = stores.stores().firstOrNull { it.id == storeId } ?: error("Unknown store $storeId")
-        var cached = dao.list(storeId)
-        if (cached != null) {
-            val expiresOn = cached.expiresOnEpochDay
-            if (expiresOn != null && today().toEpochDays() >= expiresOn) {
-                // Its deals are over: drop it so they are never shown again, and read the new list.
-                dao.delete(storeId)
-                cached = null
-            } else if (expiresOn != null || now() - cached.fetchedAtMillis in 0 until maxAge.inWholeMilliseconds) {
-                return TopOffers(store, cachedOffers(storeId))
-            }
-        }
+        val store = stores.store(storeId)
+        val cached = cachedListNotEnded(storeId)
+        if (cached != null && isFresh(cached)) return TopOffers(store, cachedOffers(storeId))
         val top = try {
             remote.topOffers(storeId)
         } catch (e: CancellationException) {
@@ -75,14 +67,37 @@ class CachedTopLists(
             dao.delete(top.store.id)
             return
         }
+        val list = CachedTopListEntity(top.store.id, now(), expiryDay(top.offers)?.toEpochDays())
+        dao.replace(list, top.offers.map { it.toEntity(top.store.id) })
+    }
+
+    /**
+     * The cached list of [storeId], unless there is none or its deals are over. An ended one is
+     * deleted on the way, so its deals are never shown again, not even offline.
+     */
+    private suspend fun cachedListNotEnded(storeId: String): CachedTopListEntity? {
+        val cached = dao.list(storeId) ?: return null
+        if (!hasEnded(cached)) return cached
+        dao.delete(storeId)
+        return null
+    }
+
+    private fun hasEnded(list: CachedTopListEntity): Boolean {
+        val expiresOn = list.expiresOnEpochDay ?: return false
+        return today().toEpochDays() >= expiresOn
+    }
+
+    /** A list with an end is used until then; one without, for [maxAge] after it was fetched. */
+    private fun isFresh(list: CachedTopListEntity): Boolean =
+        list.expiresOnEpochDay != null || now() - list.fetchedAtMillis in 0 until maxAge.inWholeMilliseconds
+
+    /** The day after the first deal ends; deals whose end cannot be read do not count. */
+    private fun expiryDay(offers: List<Offer>): LocalDate? {
         val today = today()
-        // The day after the first deal ends; deals whose end cannot be read do not count.
-        val expiresOn = top.offers
+        return offers
             .mapNotNull { offer -> offer.deal.validUntil?.let { dueDate(it, fetchedOn = today) } }
             .minOrNull()
             ?.plus(1, DateTimeUnit.DAY)
-        val list = CachedTopListEntity(top.store.id, now(), expiresOn?.toEpochDays())
-        dao.replace(list, top.offers.map { it.toEntity(top.store.id) })
     }
 
     private fun today(): LocalDate = Instant.fromEpochMilliseconds(now()).toLocalDateTime(timeZone).date

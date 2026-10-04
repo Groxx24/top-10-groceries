@@ -9,6 +9,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -42,16 +44,22 @@ fun DealInfo(deal: WeeklyDeal, modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
         )
-        listOfNotNull(deal.brand, deal.packageSize?.inLanguage(language)).takeIf { it.isNotEmpty() }?.let {
-            Text(
-                text = it.joinToString(" · "),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        BrandAndSize(deal, language)
         DealLabel(deal, language)
         DealDetails(deal)
     }
+}
+
+/** "Delhaize · 1 kg", or whichever of the two the deal has. */
+@Composable
+private fun BrandAndSize(deal: WeeklyDeal, language: String) {
+    val parts = listOfNotNull(deal.brand, deal.packageSize?.inLanguage(language))
+    if (parts.isEmpty()) return
+    Text(
+        text = parts.joinToString(SEPARATOR),
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 /** The folder's own wording; the percentage off only when it printed none. */
@@ -78,33 +86,46 @@ private fun DealLabel(deal: WeeklyDeal, language: String) {
  */
 @Composable
 private fun DealDetails(deal: WeeklyDeal) {
-    val separator = stringResource(Res.string.decimal_separator)
-    val regularPrice = deal.regularPrice?.let { stringResource(Res.string.deal_price, formatEuros(it, separator)) }
-    val price = deal.price?.let { stringResource(Res.string.deal_price, formatEuros(it, separator)) }
-    val rest = listOfNotNull(
-        deal.validUntil?.let { stringResource(Res.string.deal_valid_until, it) },
-        if (deal.needsLoyaltyCard) stringResource(Res.string.deal_loyalty_card) else null,
-    )
     val dealPriceColor = MaterialTheme.colorScheme.error
+    val price = deal.price?.let { euros(it) }
+    val regularPrice = deal.regularPrice?.let { euros(it) }
+    val parts = listOfNotNull(
+        price?.let { priceText(it, regularPrice, deal.priceUnit, dealPriceColor) },
+        deal.validUntil?.let { AnnotatedString(stringResource(Res.string.deal_valid_until, it)) },
+        if (deal.needsLoyaltyCard) AnnotatedString(stringResource(Res.string.deal_loyalty_card)) else null,
+    )
     Text(
-        text = buildAnnotatedString {
-            if (price != null) {
-                if (regularPrice != null) {
-                    withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { append(regularPrice) }
-                    append(" ")
-                }
-                withStyle(SpanStyle(color = dealPriceColor, fontWeight = FontWeight.Bold)) { append(price) }
-                deal.priceUnit?.let { append(" $it") }
-                if (rest.isNotEmpty()) append(" · ")
-            }
-            append(rest.joinToString(" · "))
-        },
+        text = parts.joinToAnnotatedString(SEPARATOR),
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
     )
 }
+
+/** "€3.09" in the phone's language's format. */
+@Composable
+private fun euros(amount: Double): String =
+    stringResource(Res.string.deal_price, formatEuros(amount, stringResource(Res.string.decimal_separator)))
+
+/** "~~€6.18~~ €3.09 /2": the [regularPrice] struck through, then the deal [price] in [priceColor]. */
+private fun priceText(price: String, regularPrice: String?, unit: String?, priceColor: Color) = buildAnnotatedString {
+    if (regularPrice != null) {
+        withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { append(regularPrice) }
+        append(" ")
+    }
+    withStyle(SpanStyle(color = priceColor, fontWeight = FontWeight.Bold)) { append(price) }
+    unit?.let { append(" $it") }
+}
+
+private fun List<AnnotatedString>.joinToAnnotatedString(separator: String) = buildAnnotatedString {
+    this@joinToAnnotatedString.forEachIndexed { index, part ->
+        if (index > 0) append(separator)
+        append(part)
+    }
+}
+
+private const val SEPARATOR = " · "
 
 /** 5.853 becomes "5.85", or "5,85" with a comma [decimalSeparator]. Common code has no number formatter. */
 internal fun formatEuros(amount: Double, decimalSeparator: String = "."): String {

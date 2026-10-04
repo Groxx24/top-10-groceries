@@ -7,14 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,16 +18,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.top10.products.di.AppContainer
 import com.top10.products.domain.model.TopOffers
 import com.top10.products.resources.Res
-import com.top10.products.resources.back
 import com.top10.products.resources.empty_hint
 import com.top10.products.resources.empty_title
-import com.top10.products.resources.error_hint
 import com.top10.products.resources.error_title
-import com.top10.products.resources.loading
-import com.top10.products.resources.retry
 import com.top10.products.resources.top_title
 import com.top10.products.resources.top_title_loading
-import com.top10.products.ui.BackArrow
+import com.top10.products.ui.BackTopBar
+import com.top10.products.ui.ErrorMessage
+import com.top10.products.ui.LoadingMessage
 import com.top10.products.ui.Message
 import org.jetbrains.compose.resources.stringResource
 
@@ -51,7 +42,6 @@ fun TopOffersRoute(container: AppContainer, storeId: String, onBack: () -> Unit)
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopOffersScreen(
     state: TopOffersUiState,
@@ -60,18 +50,10 @@ fun TopOffersScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        state.top?.let { stringResource(Res.string.top_title, it.store.name) }
-                            ?: stringResource(Res.string.top_title_loading),
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(BackArrow, contentDescription = stringResource(Res.string.back))
-                    }
-                },
+            BackTopBar(
+                title = state.top?.let { stringResource(Res.string.top_title, it.store.name) }
+                    ?: stringResource(Res.string.top_title_loading),
+                onBack = onBack,
             )
         },
     ) { padding ->
@@ -80,16 +62,8 @@ fun TopOffersScreen(
             when {
                 top != null -> OfferList(top)
 
-                state.loadFailed -> Message(
-                    title = stringResource(Res.string.error_title),
-                    hint = stringResource(Res.string.error_hint),
-                ) {
-                    Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-                }
-
-                else -> Message(title = stringResource(Res.string.loading)) {
-                    CircularProgressIndicator()
-                }
+                state.loadFailed -> ErrorMessage(stringResource(Res.string.error_title), onRetry)
+                else -> LoadingMessage()
             }
         }
     }

@@ -35,39 +35,72 @@ fun App(container: AppContainer, isDebugBuild: Boolean) {
             debugUnlocked = false
             debugStoreId = null
         }
-        val storeId = openStoreId
-        val pickStoreId = debugStoreId
-        val debugAllowed = isDebugBuild && debugOpen && debugUnlocked
-        if (isDebugBuild && debugOpen && !debugUnlocked) {
-            NavigationBackHandler(
-                state = rememberNavigationEventState(NavigationEventInfo.None),
-                onBackCompleted = closeDebug,
-            )
-            UnlockRoute(container, onUnlocked = { debugUnlocked = true }, onBack = closeDebug)
-        } else if (debugAllowed && pickStoreId != null) {
-            NavigationBackHandler(
-                state = rememberNavigationEventState(NavigationEventInfo.None),
-                onBackCompleted = { debugStoreId = null },
-            )
-            PickTopRoute(container, pickStoreId, onBack = { debugStoreId = null })
-        } else if (debugAllowed) {
-            NavigationBackHandler(
-                state = rememberNavigationEventState(NavigationEventInfo.None),
-                onBackCompleted = closeDebug,
-            )
-            DebugRoute(container, onBack = closeDebug, onPickStore = { debugStoreId = it })
-        } else if (storeId == null) {
-            StoresRoute(
+        val closePicker = { debugStoreId = null }
+        val closeStore = { openStoreId = null }
+        when (val screen = currentScreen(isDebugBuild, openStoreId, debugOpen, debugUnlocked, debugStoreId)) {
+            Screen.Unlock -> {
+                OnBack(closeDebug)
+                UnlockRoute(container, onUnlocked = { debugUnlocked = true }, onBack = closeDebug)
+            }
+
+            Screen.PickStore -> {
+                OnBack(closeDebug)
+                DebugRoute(container, onBack = closeDebug, onPickStore = { debugStoreId = it })
+            }
+
+            is Screen.PickTop -> {
+                OnBack(closePicker)
+                PickTopRoute(container, screen.storeId, onBack = closePicker)
+            }
+
+            Screen.Stores -> StoresRoute(
                 container,
                 onOpenStore = { openStoreId = it },
                 onOpenDebug = if (isDebugBuild) ({ debugOpen = true }) else null,
             )
-        } else {
-            NavigationBackHandler(
-                state = rememberNavigationEventState(NavigationEventInfo.None),
-                onBackCompleted = { openStoreId = null },
-            )
-            TopOffersRoute(container, storeId, onBack = { openStoreId = null })
+
+            is Screen.Top -> {
+                OnBack(closeStore)
+                TopOffersRoute(container, screen.storeId, onBack = closeStore)
+            }
         }
     }
+}
+
+private sealed interface Screen {
+    data object Stores : Screen
+    data class Top(val storeId: String) : Screen
+    data object Unlock : Screen
+    data object PickStore : Screen
+    data class PickTop(val storeId: String) : Screen
+}
+
+/**
+ * The screen the navigation state stands for. The debug screens only exist in a debug build, and
+ * only once unlocked; until then opening them shows the passphrase screen.
+ */
+private fun currentScreen(
+    isDebugBuild: Boolean,
+    openStoreId: String?,
+    debugOpen: Boolean,
+    debugUnlocked: Boolean,
+    debugStoreId: String?,
+): Screen = when {
+    isDebugBuild && debugOpen -> when {
+        !debugUnlocked -> Screen.Unlock
+        debugStoreId != null -> Screen.PickTop(debugStoreId)
+        else -> Screen.PickStore
+    }
+
+    openStoreId != null -> Screen.Top(openStoreId)
+    else -> Screen.Stores
+}
+
+/** Makes the system back gesture call [onBack] while this screen is shown. */
+@Composable
+private fun OnBack(onBack: () -> Unit) {
+    NavigationBackHandler(
+        state = rememberNavigationEventState(NavigationEventInfo.None),
+        onBackCompleted = onBack,
+    )
 }

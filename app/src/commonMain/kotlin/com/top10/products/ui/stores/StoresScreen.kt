@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,16 +38,14 @@ import com.top10.products.di.AppContainer
 import com.top10.products.domain.model.Store
 import com.top10.products.resources.Res
 import com.top10.products.resources.debug_title
-import com.top10.products.resources.error_hint
-import com.top10.products.resources.loading
-import com.top10.products.resources.retry
 import com.top10.products.resources.stores_card_hint
 import com.top10.products.resources.stores_error_title
 import com.top10.products.resources.stores_hint
 import com.top10.products.resources.stores_section
 import com.top10.products.resources.stores_title
 import com.top10.products.ui.BackArrow
-import com.top10.products.ui.Message
+import com.top10.products.ui.ErrorMessage
+import com.top10.products.ui.LoadingMessage
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -98,16 +94,8 @@ fun StoreList(
 ) {
     Box(modifier) {
         when {
-            state.loadFailed -> Message(
-                title = stringResource(Res.string.stores_error_title),
-                hint = stringResource(Res.string.error_hint),
-            ) {
-                Button(onClick = onRetry) { Text(stringResource(Res.string.retry)) }
-            }
-
-            state.isLoading -> Message(title = stringResource(Res.string.loading)) {
-                CircularProgressIndicator()
-            }
+            state.loadFailed -> ErrorMessage(stringResource(Res.string.stores_error_title), onRetry)
+            state.isLoading -> LoadingMessage()
 
             else -> LazyColumn(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
