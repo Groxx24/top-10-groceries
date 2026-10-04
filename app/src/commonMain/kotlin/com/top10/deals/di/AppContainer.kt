@@ -50,13 +50,14 @@ class AppContainer(databaseBuilder: RoomDatabase.Builder<TopListDatabase>) {
 
     val getStores = GetStoresUseCase(storeRepository)
     val getTopOffers by lazy { GetTopOffersUseCase(topLists) }
-    val getWeeklyDeals = GetWeeklyDealsUseCase(storeRepository, weeklyDealsRepository)
+    val getWeeklyDeals = GetWeeklyDealsUseCase(storeRepository, weeklyDealsRepository, ::today)
     val submitTopList by lazy { SubmitTopListUseCase(topLists) }
     val deleteEndedTopLists by lazy {
-        DeleteEndedTopListsUseCase(firestoreTopLists) {
-            Clock.System.now().toLocalDateTime(TimeZone.of("Europe/Brussels")).date
-        }
+        DeleteEndedTopListsUseCase(firestoreTopLists, ::today)
     }
+
+    /** Today in Belgium, which is when the deals' "valid until" dates end. */
+    private fun today() = Clock.System.now().toLocalDateTime(TimeZone.of("Europe/Brussels")).date
 
     // The passphrase, hashed, that opens the debug screens on top of the debug-build check.
     val unlockDebug = UnlockDebugUseCase(HashedDebugLock())

@@ -23,6 +23,8 @@
     <string name="debug_submit">Lijst indienen</string>
     <string name="debug_submitted">Toplijst gepubliceerd</string>
     <string name="debug_submit_failed">De lijst kon niet worden gepubliceerd. Probeer het opnieuw.</string>
+    <string name="debug_too_few_deals_title">Niet genoeg lopende promoties</string>
+    <string name="debug_too_few_deals_hint">%1$s heeft %2$d promoties die nog niet voorbij zijn; een toplijst heeft er %3$d nodig. Voeg eerst de promoties van deze week toe.</string>
     <string name="debug_delete_ended">Afgelopen toplijsten verwijderen</string>
     <string name="debug_delete_ended_hint">Verwijdert uit Firestore elke toplijst waarvan de promoties voorbij zijn.</string>
     <string name="debug_delete_ended_confirm_title">Afgelopen toplijsten verwijderen?</string>

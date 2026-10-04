@@ -35,10 +35,10 @@ import com.top10.deals.domain.repository.WeeklyDealsRepository
 
 /**
  * This week's deals per store, typed in by hand until they are scraped, in English, French and
- * Dutch. Delhaize's are copied from its own folders: French and Dutch exactly as each folder
- * prints them, English translated. The other stores' come from Belgian folder sites as they listed
- * them on 3 October 2026, are not checked against the folders, and are translated by hand into all
- * three languages; the rest are made up (see [madeUp]) to make 20.
+ * Dutch. Delhaize's are copied from its own folders and ALDI's from its own offers page: French
+ * and Dutch exactly as each store prints them, English translated. The other stores' come from
+ * Belgian folder sites as they listed them on 3 October 2026, are not checked against the folders,
+ * and are translated by hand into all three languages; the rest are made up (see [madeUp]) to make 20.
  */
 class HardcodedWeeklyDeals : WeeklyDealsRepository {
 
@@ -110,32 +110,37 @@ class HardcodedWeeklyDeals : WeeklyDealsRepository {
                     deal(DAIRY, t("Apple and cinnamon yoghurt", "Yaourt pomme/cannelle", "Yoghurt appel/kaneel"), "Delhaize", same("180 g"), delhaizeSecondAt("-50%"), 1.43, "/2", was = 1.90, card = true, until = "07/10"),
                 ),
             ),
-            // Folder valid 28/09 to 03/10. ALDI prints most deals as a price only.
+            // From ALDI's own offers page (aldi.be/aanbiedingen and /offres) on 4 October 2026, French
+            // and Dutch as it lists them, English translated: the week 41 groceries (05/10 to 10/10)
+            // and the end of the 02/10 to 08/10 offers. Sorted by how much they save.
             "aldi" to deals(
                 "aldi",
                 listOf(
-                    deal(FRUIT, t("Avocados", "Avocats", "Avocado’s"), null, t("3 pieces", "3 pièces", "3 stuks"), null, 2.58, was = 3.87, until = "03/10"),
-                    deal(VEGETABLES, t("Mini chicory", "Mini-chicons", "Miniwitloof"), null, null, same("-29%"), null, until = "03/10"),
-                    deal(MEAT, t("Hamburgers, family pack", "Hamburgers, colis familial", "Hamburgers, colli"), null, null, null, 8.99, until = "03/10"),
-                    deal(FRUIT, same("Kiwi Sungold Jumbo"), "Zespri", null, null, 3.29, until = "03/10"),
-                    deal(CHEESE, t("Grated Emmental", "Emmental râpé", "Geraspte emmentaler"), "Milsani", null, null, 2.99, until = "03/10"),
-                    deal(FISH, t("Fish fingers", "Bâtonnets de poisson", "Vissticks"), "Iglo", null, null, 6.38, until = "03/10"),
-                    deal(POULTRY, t("Chicken and turkey crunchies", "Crunchies poulet-dinde", "Crunchies kip-kalkoen"), null, t("10 pieces", "10 pièces", "10 stuks"), null, null, until = "03/10"),
-                    deal(SOFT_DRINKS, t("Cola zero sugar", "Cola zéro sucre", "Cola zero suiker"), "Pepsi", t("6 x 1.5 L", "6 x 1,5 L", "6 x 1,5 L"), null, 8.99, until = "03/10"),
-                    deal(WATER, t("Mineral water", "Eau minérale", "Mineraalwater"), "Evian", null, null, 13.39, until = "03/10"),
-                    deal(BEER, t("Beer, cold grip", "Bière, cold grip", "Bier, cold grip"), "Stella Artois", null, null, 12.13, until = "03/10"),
-                    deal(LAUNDRY, t("Liquid laundry detergent", "Lessive liquide", "Vloeibaar wasmiddel"), "Dreft", null, free("1+1"), 10.49, until = "03/10"),
-                    deal(SNACKS, t("Crisps", "Chips", "Chips"), "Sun Snacks", null, null, 1.99, until = "03/10"),
-                    deal(SNACKS, t("Mixed snacks", "Snacks mixtes", "Gemengde snacks"), "Sun Snacks", null, null, 3.00, until = "03/10"),
-                    deal(SOFT_DRINKS, t("Ginger beer", "Ginger beer", "Gemberbier"), "River", null, null, 3.99, until = "03/10"),
-                    deal(BABY, t("Baby wipes Sensitive", "Lingettes bébé Sensitive", "Babydoekjes Sensitive"), "Mamia", t("80 wipes", "80 pièces", "80 stuks"), t("+20 points with the app", "+20 points avec l’app", "+20 punten met de app"), null, card = true, until = "03/10"),
-                    deal(PERSONAL_CARE, t("Intimate wash", "Soin lavant intime", "Intieme wasemulsie"), "Lactacyd", same("2 x 300 ml"), free("1+1"), 11.99, until = "03/10"),
-                    deal(PET, t("Dry dog food", "Croquettes pour chiens", "Droge hondenvoeding"), "Romeo", null, null, 2.99, until = "03/10"),
-                    deal(PET, t("Dental sticks for dogs", "Bâtonnets dentaires pour chiens", "Kauwstaafjes voor honden"), "Romeo", null, null, 2.99, until = "03/10"),
-                    deal(SPIRITS, t("Cream liqueur", "Liqueur à la crème", "Roomlikeur"), "Blackstone", null, null, 8.99, until = "03/10"),
-                    deal(PERSONAL_CARE, t("Denture cleaning tablets", "Comprimés nettoyants pour prothèses dentaires", "Reinigingstabletten voor kunstgebit"), "Steradent", null, null, 5.99, until = "03/10"),
-                    deal(CLEANING, t("1-2-Spray mop", "Balai 1-2-Spray", "1-2-Spray-vloerwisser"), "Vileda", null, null, 16.99, until = "03/10"),
-                    deal(COFFEE_TEA, t("Diet tea", "Thé minceur", "Dieetthee"), "Juvamine", null, null, 2.99, until = "03/10"),
+                    deal(POULTRY, t("Chicken breast fillet", "Filet de poitrine de poulet", "Kippenborstfilet"), null, same("2 kg"), same("-43%"), 13.99, was = 24.97, until = "10/10"),
+                    deal(PAPER, t("Think Pink toilet paper, 24 rolls", "Papier toilette Think pink, 24 pcs", "Think pink-toiletpapier, 24 st."), "Cosynel", t("Per pack", "Le paquet", "Per pak"), free("12+12"), 9.99, was = 19.98, until = "08/10"),
+                    deal(LAUNDRY, t("Liquid laundry detergent", "Lessive liquide", "Vloeibaar wasmiddel"), "Dreft", t("2 x 32 washes", "2 x 32 cycles", "2 x 32 wasbeurten"), free("1+1"), 10.49, was = 20.98, until = "08/10"),
+                    deal(MEAT, t("Irish steak", "Steak irlandais", "Ierse steak"), null, same("2 x 300 g"), free("1+1"), 8.69, was = 17.38, until = "10/10"),
+                    deal(POULTRY, t("Chicken chipolatas", "Chipolatas de poulet", "Kippenchipolata's"), null, same("2 x 1 kg"), free("1+1"), 8.69, was = 17.38, until = "10/10"),
+                    deal(VEGETABLES, t("Potatoes for chips", "Pommes de terre pour frites", "Frietaardappelen"), null, same("2 x 5 kg"), free("1+1"), 7.99, was = 15.98, until = "10/10"),
+                    deal(SWEETS, t("Cereal bars, 12 pieces", "Barres aux céréales, 12 pcs", "Graanrepen, 12 st."), "Nesquik", same("12 x 25 g"), free("6+6"), 3.99, was = 7.98, until = "08/10"),
+                    deal(FROZEN, t("Cheese croquettes, 4 pieces", "Croquettes de fromage, 4 pcs", "Kaaskroketten, 4 st."), "Mora", same("2 x (4 x 70 g)"), t("2nd at -50%", "2e à -50%", "2e aan -50%"), 9.58, was = 12.78, until = "08/10"),
+                    deal(COFFEE_TEA, t("Instant coffee, dessert", "Café soluble dessert", "Oploskoffie dessert"), "Nescafé", same("2 x 190 g"), t("2nd at -50%", "2e à -50%", "2e aan -50%"), 12.73, was = 16.98, until = "08/10"),
+                    deal(SOFT_DRINKS, t("Coca-Cola regular, 24 cans", "Coca-Cola regular, 24 pcs", "Coca-Cola regular, 24 st."), "Coca-Cola", same("24 x 25 cl"), free("18+6"), 11.45, was = 15.27, until = "08/10"),
+                    deal(FISH, t("Scallops", "Noix de Saint-Jacques", "Sint-jakobsnoten"), "Gourmet Finest Cuisine", same("200 g"), same("-30%"), 6.99, was = 9.99, until = "10/10"),
+                    deal(POULTRY, t("Chicken fillet strips", "Lamelles de poulet", "Kipfiletreepjes"), null, same("500 g"), same("-30%"), 4.89, was = 6.99, until = "10/10"),
+                    deal(VEGETABLES, t("Onions", "Oignons", "Uien"), null, same("2 kg"), same("-30%"), 1.79, was = 2.59, until = "10/10"),
+                    deal(FRUIT, t("White grapes with seeds", "Raisins blancs avec pépins", "Witte druiven met pit"), null, same("750 g"), same("-30%"), 1.99, was = 2.85, until = "10/10"),
+                    deal(FRUIT, t("Seedless black grapes", "Raisins noirs sans pépins", "Pitloze blauwe druiven"), null, same("500 g"), same("-31%"), 1.50, was = 2.19, until = "10/10"),
+                    deal(FRUIT, t("Strawberries", "Fraises", "Aardbeien"), null, same("2 x 500 g"), t("2nd at -50%", "2e à -50%", "2de aan -50%"), 6.73, was = 8.98, until = "10/10"),
+                    deal(FRUIT, t("Mango", "Mangue", "Mango"), null, t("2 x 1 piece", "2 x 1 pce", "2 x 1 st."), t("2nd at -50%", "2e à -50%", "2de aan -50%"), 2.83, was = 3.78, until = "10/10"),
+                    deal(FISH, t("Fresh salmon with skin, 8 pieces", "Saumon frais avec peau, 8 pcs", "Verse zalm met huid, 8 st."), "Golden Seafood", same("8 x 125 g"), same("-19%"), 16.99, was = 21.20, until = "10/10"),
+                    deal(VEGETABLES, t("Brussels sprouts", "Choux de Bruxelles", "Spruiten"), null, same("1 kg"), same("-25%"), 2.29, was = 3.05, until = "10/10"),
+                    deal(BAKERY, t("Brown tiger bread", "Pain gris tigré", "Bruin tijgerbrood"), null, same("800 g"), same("-25%"), 1.49, was = 1.99, until = "10/10"),
+                    deal(CHEESE, t("Grated Emmental", "Emmental râpé", "Geraspte emmental"), "Milsani", same("500 g"), same("-25%"), 2.99, was = 3.99, until = "08/10"),
+                    deal(BEER, t("Pils, 18 bottles", "Pils, 18 pcs", "Pils, 18 st."), "Jupiler", t("18 x 35.5 cl", "18 x 35,5 cl", "18 x 35,5 cl"), free("15+3"), 15.99, was = 19.19, until = "08/10"),
+                    deal(WINE, t("Organic red wine 'Esteban'", "Vin rouge bio 'Esteban'", "Rode biowijn 'Esteban'"), null, same("2 x 75 cl"), t("2nd at -50%", "2e à -50%", "2e aan -50%"), 7.48, was = 9.98, until = "08/10"),
+                    deal(VEGETABLES, t("Broccoli", "Brocoli", "Broccoli"), null, same("500 g"), same("-22%"), 1.00, was = 1.29, until = "10/10"),
+                    deal(VEGETABLES, t("Butternut squash", "Courge butternut", "Butternutpompoen"), null, t("Per kg", "Le kg", "Per kg"), same("-20%"), 1.50, "/kg", was = 1.89, until = "10/10"),
                 ),
             ),
             // Week 40 folder (28/09 to 03/10) and week 41 folder (05/10 to 10/10).

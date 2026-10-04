@@ -10,6 +10,7 @@ import com.top10.deals.domain.usecase.SubmitTopListUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.datetime.LocalDate
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
@@ -40,7 +41,7 @@ class PickTopViewModelTest {
 
     private fun viewModel(publisher: TopListPublisher = FakePublisher()) = PickTopViewModel(
         "delhaize",
-        GetWeeklyDealsUseCase(HardcodedCatalog(), HardcodedWeeklyDeals()),
+        GetWeeklyDealsUseCase(HardcodedCatalog(), HardcodedWeeklyDeals()) { LocalDate(2026, 10, 1) },
         SubmitTopListUseCase(publisher),
     )
 

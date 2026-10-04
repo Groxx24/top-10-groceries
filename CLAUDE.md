@@ -27,7 +27,8 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   `GetTopOffersUseCase(storeId)`. Nothing in the UI or domain is specific to a store.
 - `ui/debug/`: debug builds only. A store picker (the same `StoreList` composable as the store
   list, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
-  candidate deals from `GetWeeklyDealsUseCase(storeId)`, a multi-select capped at exactly
+  candidate deals from `GetWeeklyDealsUseCase(storeId)` (deals already ended are dropped and the
+  next ones take their place; under 10 left, the screen says so instead), a multi-select capped at exactly
   `TOP_LIST_SIZE` (10), and a "Submit list" button enabled only at 10 that publishes the picks
   through `SubmitTopListUseCase`. Below the store picker, "Delete ended lists" (after a confirm
   dialog) runs `DeleteEndedTopListsUseCase`: it reads every document in `topLists` through
@@ -76,7 +77,8 @@ prints both); English is always translated. Submitting publishes all three.
 - `WeeklyDealsRepository` gives a store's deals of the week, most relevant first; the debug flow
   offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` is typed in by
   hand for week 40 of 2026: Delhaize's from its own folder (the PDF behind folder-fr.delhaize.be),
-  the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
+  ALDI's (week 41) from its own offers page (aldi.be/aanbiedingen and /offres, whose
+  `validUntilLocalDate` is the day after the last one), the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
   the sites showed fewer than 20. Scraping would replace it.
 - Top lists are in Firestore. `data/firebase/FirestoreTopLists` is both the `TopOffersRepository`
   the app reads and the `TopListPublisher` and `PublishedTopLists` the debug screen writes and

@@ -41,9 +41,12 @@ import com.top10.deals.resources.debug_selected_count
 import com.top10.deals.resources.debug_submit
 import com.top10.deals.resources.debug_submit_failed
 import com.top10.deals.resources.debug_submitted
+import com.top10.deals.resources.debug_too_few_deals_hint
+import com.top10.deals.resources.debug_too_few_deals_title
 import com.top10.deals.ui.BackTopBar
 import com.top10.deals.ui.ErrorMessage
 import com.top10.deals.ui.LoadingMessage
+import com.top10.deals.ui.Message
 import com.top10.deals.ui.deal.DealInfo
 import com.top10.deals.ui.deal.DealPicture
 import org.jetbrains.compose.resources.stringResource
@@ -86,7 +89,7 @@ fun PickTopScreen(
             )
         },
         bottomBar = {
-            if (state.candidates != null) {
+            if (state.candidates != null && state.candidates.deals.size >= TOP_LIST_SIZE) {
                 SubmitBar(
                     selectedCount = state.selectedIds.size,
                     canSubmit = state.canSubmit,
@@ -99,6 +102,10 @@ fun PickTopScreen(
         Box(Modifier.fillMaxSize().padding(padding)) {
             val candidates = state.candidates
             when {
+                candidates != null && candidates.deals.size < TOP_LIST_SIZE -> Message(
+                    title = stringResource(Res.string.debug_too_few_deals_title),
+                    hint = stringResource(Res.string.debug_too_few_deals_hint, candidates.store.name, candidates.deals.size, TOP_LIST_SIZE),
+                )
                 candidates != null -> CandidateList(candidates.deals, state.selectedIds, state.isFull, onToggle)
                 state.loadFailed -> ErrorMessage(stringResource(Res.string.debug_deals_error_title), onRetry)
                 else -> LoadingMessage()

@@ -23,6 +23,8 @@
     <string name="debug_submit">Submit list</string>
     <string name="debug_submitted">Top list published</string>
     <string name="debug_submit_failed">Could not publish the list. Try again.</string>
+    <string name="debug_too_few_deals_title">Not enough current deals</string>
+    <string name="debug_too_few_deals_hint">%1$s has %2$d deals that have not ended; a top list needs %3$d. Add this week’s deals first.</string>
     <string name="debug_delete_ended">Delete ended lists</string>
     <string name="debug_delete_ended_hint">Removes from Firestore every top list whose deals are over.</string>
     <string name="debug_delete_ended_confirm_title">Delete ended lists?</string>
