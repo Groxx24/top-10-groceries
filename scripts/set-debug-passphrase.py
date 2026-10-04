@@ -18,7 +18,7 @@ import sys
 ITERATIONS = 100_000
 TARGET = os.path.join(
     os.path.dirname(__file__), "..", "app", "src", "commonMain", "kotlin",
-    "com", "top10", "products", "data", "lock", "DebugPassphrase.kt",
+    "com", "top10", "deals", "data", "lock", "DebugPassphrase.kt",
 )
 
 
@@ -41,7 +41,7 @@ def main() -> None:
     salt = secrets.token_bytes(16)
     digest = hashlib.pbkdf2_hmac("sha256", passphrase.encode(), salt, ITERATIONS, 32)
     with open(TARGET, "w") as out:
-        out.write(f'''package com.top10.products.data.lock
+        out.write(f'''package com.top10.deals.data.lock
 
 /**
  * The debug passphrase, hashed. Written by `scripts/set-debug-passphrase.py`; run it to change the

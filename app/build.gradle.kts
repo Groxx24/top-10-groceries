@@ -59,11 +59,11 @@ room {
 }
 
 compose.resources {
-    packageOfResClass = "com.top10.products.resources"
+    packageOfResClass = "com.top10.deals.resources"
 }
 
 android {
-    namespace = "com.top10.products"
+    namespace = "com.top10.deals"
     compileSdk {
         version = release(36)
     }

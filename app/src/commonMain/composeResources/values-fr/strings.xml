@@ -1,5 +1,5 @@
 <resources>
-    <string name="stores_title">Top 10 Produits</string>
+    <string name="stores_title">Top 10 Promos</string>
     <string name="stores_hint">Choisissez un magasin pour voir les dix meilleures offres de la semaine.</string>
     <string name="stores_section">Magasins</string>
     <string name="stores_card_hint">Voir le top 10 de la semaine</string>

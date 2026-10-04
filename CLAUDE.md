@@ -1,10 +1,10 @@
-# Top 10 Products
+# Top 10 Deals
 
 Shows the ten best offers of the week at a grocery store. The app picks a store, then reads that
 store's top list from Firestore by its id; it does no ranking itself. The lists are picked and
 published from this same app's debug-only screens. Built with Compose
 Multiplatform, Android target only for now. Single Gradle module `:app`, package
-`com.top10.products`.
+`com.top10.deals` (the applicationId is still `com.top10.products`, the id Firebase knows the app by).
 
 ## Architecture
 
