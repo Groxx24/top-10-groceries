@@ -31,7 +31,8 @@ import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 /**
- * A deal as the folder gives it, in the phone's language: name, brand and pack size, the deal
+ * A deal as the folder gives it, in the phone's language: its brand as the title with what the
+ * product is below it (or that as the title when there is no brand), the pack size, the deal
  * label, and the prices. The pick screen and the published top list both show deals this way.
  */
 @Composable
@@ -39,21 +40,25 @@ fun DealInfo(deal: WeeklyDeal, modifier: Modifier = Modifier) {
     // The phone's language, falling back to English like the app's own strings do.
     val language = Locale.current.language
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        val name = deal.name.inLanguage(language)
         Text(
-            text = deal.name.inLanguage(language),
+            text = deal.brand ?: name,
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
         )
-        BrandAndSize(deal, language)
+        Description(description = name.takeIf { deal.brand != null }, size = deal.packageSize?.inLanguage(language))
         DealLabel(deal, language)
         DealDetails(deal)
     }
 }
 
-/** "Delhaize · 1 kg", or whichever of the two the deal has. */
+/**
+ * "Cheese · 180 g" under a branded deal's brand, or only the pack size when the deal has no brand
+ * and its description is already the title.
+ */
 @Composable
-private fun BrandAndSize(deal: WeeklyDeal, language: String) {
-    val parts = listOfNotNull(deal.brand, deal.packageSize?.inLanguage(language))
+private fun Description(description: String?, size: String?) {
+    val parts = listOfNotNull(description, size)
     if (parts.isEmpty()) return
     Text(
         text = parts.joinToString(SEPARATOR),
