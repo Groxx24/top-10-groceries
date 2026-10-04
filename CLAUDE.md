@@ -111,15 +111,16 @@ prints both); English is always translated. Submitting publishes all three.
   submit writes the new list straight into the cache. Other phones only see a resubmitted list
   once their copy has ended. The database is only a cache, so a schema change drops it (no migrations); its schema is
   still exported to `app/schemas/`, which is committed.
-- `DebugLock` guards the debug screens. `data/lock/HashedDebugLock` holds only a salt and a
-  PBKDF2-SHA256 hash of the passphrase (`data/lock/DebugPassphrase.kt`, 100,000 iterations, via
-  `org.kotlincrypto.macs:hmac-sha2` because common code has no `java.security`). Change the
-  passphrase with `python3 scripts/set-debug-passphrase.py` (or `--generate`), never by editing
-  that file, and never commit the passphrase itself. The lock is in the app only: Firestore's
-  rules cannot see it, so it does not stop someone writing to Firestore without the app.
+- `DebugLock` guards the debug screens. `data/firebase/FirebaseDebugLock` signs in to Firebase
+  Auth as the publisher account (`FirebaseDebugLock.PUBLISHER_EMAIL`, made by hand in the Firebase
+  console) with the passphrase typed on `UnlockScreen` as its password, and stays signed in. The
+  password lives only in Firebase; never commit it. `firestore.rules` (pasted into the console by
+  hand, with the publisher's UID in place of `PUBLISHER_UID`) lets anyone read `topLists` and only
+  that account write or delete, so the lock also holds against someone using the Firebase config
+  without the app. Change the passphrase by changing that account's password in the console.
 - Firebase is set up: the `com.google.gms.google-services` plugin reads `app/google-services.json`
   (gitignored, so every checkout needs its own copy), and Firestore is used through GitLive's
-  multiplatform SDK (`dev.gitlive:firebase-firestore`) so the Firebase implementations live in
+  multiplatform SDK (`dev.gitlive:firebase-firestore`, and `firebase-auth` for the publisher) so the Firebase implementations live in
   `commonMain` like the rest of the data layer. The Firebase BoM in `androidMain` is pinned to the
   version that GitLive release is built against. Crashlytics (plugin plus the Android SDK in
   `androidMain`) reports crashes on its own; no code calls it.

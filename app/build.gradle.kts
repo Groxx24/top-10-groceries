@@ -39,7 +39,8 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
             implementation(libs.gitlive.firebase.firestore)
-            implementation(libs.kotlincrypto.hmac.sha2)
+            // Signs the publisher in on the debug screens, so Firestore lets them write.
+            implementation(libs.gitlive.firebase.auth)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
             implementation(libs.kotlinx.datetime)

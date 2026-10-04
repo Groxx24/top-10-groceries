@@ -1,9 +1,9 @@
 package com.top10.deals.di
 
 import androidx.room.RoomDatabase
+import com.top10.deals.data.firebase.FirebaseDebugLock
 import com.top10.deals.data.firebase.FirestoreTopLists
 import com.top10.deals.data.hardcoded.HardcodedCatalog
-import com.top10.deals.data.lock.HashedDebugLock
 import com.top10.deals.data.hardcoded.HardcodedWeeklyDeals
 import com.top10.deals.data.local.CachedTopLists
 import com.top10.deals.data.local.TopListDatabase
@@ -17,6 +17,7 @@ import com.top10.deals.domain.usecase.GetWeeklyDealsUseCase
 import com.top10.deals.domain.usecase.SubmitTopListUseCase
 import com.top10.deals.domain.usecase.UnlockDebugUseCase
 import dev.gitlive.firebase.Firebase
+import dev.gitlive.firebase.auth.auth
 import dev.gitlive.firebase.firestore.firestore
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -59,6 +60,7 @@ class AppContainer(databaseBuilder: RoomDatabase.Builder<TopListDatabase>) {
     /** Today in Belgium, which is when the deals' "valid until" dates end. */
     private fun today() = Clock.System.now().toLocalDateTime(TimeZone.of("Europe/Brussels")).date
 
-    // The passphrase, hashed, that opens the debug screens on top of the debug-build check.
-    val unlockDebug = UnlockDebugUseCase(HashedDebugLock())
+    // Signs the publisher in to Firebase, which opens the debug screens on top of the debug-build
+    // check and lets them write to Firestore. Lazy so Firebase Auth starts only when asked.
+    val unlockDebug by lazy { UnlockDebugUseCase(FirebaseDebugLock(Firebase.auth)) }
 }

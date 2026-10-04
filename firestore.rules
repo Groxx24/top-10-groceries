@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Paste into Firebase console → Firestore Database → Rules, with PUBLISHER_UID replaced by the id
+// of the publisher account (Authentication → Users, "User UID"). Everyone may read the top lists;
+// only that account, signed in from the debug screens, may write or delete them. Anything not
+// matched here is denied.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /topLists/{storeId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == 'PUBLISHER_UID';
+    }
+  }
+}
