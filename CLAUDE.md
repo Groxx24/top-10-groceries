@@ -37,6 +37,12 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
 - ViewModels are kept for the whole session (keyed by store id), so a screen whose data can
   change in between asks again each time it opens: `TopOffersRoute` calls
   `TopOffersViewModel.onOpened()` from a `LaunchedEffect` instead of loading once in `init`.
+- Colours live in `ui/theme/Theme.kt`: `Top10Theme`, a light and a dark Material 3 scheme (green,
+  orange accent) following the phone's setting, with every role set in both so nothing falls back
+  to Material's purple baseline. Screens use `MaterialTheme.colorScheme` roles, never fixed
+  colours, except for what must look the same in both (white logo tiles, medal badges, the
+  translucent category tints in `DealPicture`). The pre-Compose window background in
+  `androidMain/res/values{,-night}/colors.xml` matches each scheme's `background`.
 - Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag,
   whether the debug screens are unlocked, and the store being picked for. Back goes one screen
   up; leaving the debug screens locks them again.
