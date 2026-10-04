@@ -44,18 +44,15 @@ class CachedTopListsTest {
     }
 
     @Test
-    fun `a deal already over when the list is read does not end the list`() = runTest {
+    fun `a list that has already ended in Firestore is shown as empty`() = runTest {
         val store = catalog.stores().first()
         remote.lists[store.id] = listOf(offer(1, "Avocados", until = "30/09"), offer(2, "Bananas", until = "07/10"))
 
-        topLists.topOffers(store.id)
-        now += 3.days.inWholeMilliseconds // Sunday 4 October.
-        topLists.topOffers(store.id)
-        assertEquals(1, remote.reads)
+        assertTrue(topLists.topOffers(store.id).offers.isEmpty())
+        assertEquals(null, dao.list(store.id))
 
-        now += 4.days.inWholeMilliseconds // Thursday 8 October: the bananas have ended.
-        topLists.topOffers(store.id)
-        assertEquals(2, remote.reads)
+        remote.lists[store.id] = listOf(offer(1, "Apples", until = "07/10"))
+        assertEquals(listOf("Apples"), topLists.topOffers(store.id).offers.map { it.deal.name.en })
     }
 
     @Test

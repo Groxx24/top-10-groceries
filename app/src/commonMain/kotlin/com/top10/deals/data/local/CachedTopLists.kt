@@ -23,8 +23,9 @@ import kotlin.time.Instant
  * The top lists, read from [remote] once and kept in [dao], so opening a store again does not read
  * Firestore again. A cached list is kept until the day after the first of its deals ends ("valid
  * until 07/10" keeps it through 7 October in [timeZone]); then it is deleted and read again, and
- * not before. Deals already over when the list is read do not count. A list whose deals give no
- * end that has not passed is read again after [maxAge]. A store with no list published is not
+ * not before. A list read from [remote] that has already ended the same way is shown as empty and
+ * not cached, until the admin replaces or deletes it. A list whose deals give no end is read again
+ * after [maxAge]. A store with no list published is not
  * cached at all, so it is read from Firestore every time until one is. When
  * [remote] fails, a copy that has not ended yet is shown rather than an error. Publishing writes
  * through, so the new list is cached at once.
@@ -53,8 +54,10 @@ class CachedTopLists(
             if (cached == null) throw e
             return TopOffers(store, cachedOffers(storeId))
         }
-        save(top)
-        return top
+        // An ended list still in Firestore is not shown; the admin deletes or replaces it.
+        val shown = if (hasEnded(expiryDay(top.offers))) TopOffers(store, emptyList()) else top
+        save(shown)
+        return shown
     }
 
     override suspend fun publish(top: TopOffers) {
@@ -88,20 +91,17 @@ class CachedTopLists(
         return today().toEpochDays() >= expiresOn
     }
 
+    private fun hasEnded(expiresOn: LocalDate?): Boolean = expiresOn != null && today() >= expiresOn
+
     /** A list with an end is used until then; one without, for [maxAge] after it was fetched. */
     private fun isFresh(list: CachedTopListEntity): Boolean =
         list.expiresOnEpochDay != null || now() - list.fetchedAtMillis in 0 until maxAge.inWholeMilliseconds
 
-    /**
-     * The day after the first deal ends. Deals whose end cannot be read do not count, and neither
-     * do deals already over when the list is read: one of those would end the list at once and
-     * make every open read Firestore again.
-     */
+    /** The day after the first deal ends; deals whose end cannot be read do not count. */
     private fun expiryDay(offers: List<Offer>): LocalDate? {
         val today = today()
         return offers
             .mapNotNull { offer -> offer.deal.validUntil?.let { dueDate(it, fetchedOn = today) } }
-            .filter { it >= today }
             .minOrNull()
             ?.plus(1, DateTimeUnit.DAY)
     }
