@@ -38,6 +38,7 @@ import com.top10.deals.di.AppContainer
 import com.top10.deals.domain.model.Store
 import com.top10.deals.resources.Res
 import com.top10.deals.resources.debug_title
+import com.top10.deals.resources.privacy_options
 import com.top10.deals.resources.stores_card_hint
 import com.top10.deals.resources.stores_error_title
 import com.top10.deals.resources.stores_hint
@@ -53,6 +54,8 @@ fun StoresRoute(
     container: AppContainer,
     onOpenStore: (storeId: String) -> Unit,
     onOpenDebug: (() -> Unit)?,
+    onOpenPrivacyOptions: (() -> Unit)?,
+    banner: @Composable () -> Unit,
 ) {
     val viewModel = viewModel { StoresViewModel(container.getStores) }
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -61,6 +64,8 @@ fun StoresRoute(
         onRetry = viewModel::onRetry,
         onOpenStore = onOpenStore,
         onOpenDebug = onOpenDebug,
+        onOpenPrivacyOptions = onOpenPrivacyOptions,
+        banner = banner,
     )
 }
 
@@ -71,15 +76,21 @@ fun StoresScreen(
     onOpenStore: (storeId: String) -> Unit,
     /** Null hides the entry point, which only debug builds show. */
     onOpenDebug: (() -> Unit)? = null,
+    /** Null hides the button; only users whose consent to ads can be changed (the EEA) need it. */
+    onOpenPrivacyOptions: (() -> Unit)? = null,
+    /** The ad under the list, which comes from the platform. */
+    banner: @Composable () -> Unit = {},
 ) {
     Scaffold { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             Header(
                 onOpenDebug = onOpenDebug,
+                onOpenPrivacyOptions = onOpenPrivacyOptions,
                 modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 24.dp, bottom = 16.dp),
             )
             HorizontalDivider()
             StoreList(state, onRetry, onOpenStore, Modifier.weight(1f))
+            banner()
         }
     }
 }
@@ -119,7 +130,11 @@ fun StoreList(
 
 /** The app's name and what it does, above the list. */
 @Composable
-private fun Header(onOpenDebug: (() -> Unit)?, modifier: Modifier = Modifier) {
+private fun Header(
+    onOpenDebug: (() -> Unit)?,
+    onOpenPrivacyOptions: (() -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -128,6 +143,9 @@ private fun Header(onOpenDebug: (() -> Unit)?, modifier: Modifier = Modifier) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f),
             )
+            if (onOpenPrivacyOptions != null) {
+                TextButton(onClick = onOpenPrivacyOptions) { Text(stringResource(Res.string.privacy_options)) }
+            }
             if (onOpenDebug != null) {
                 TextButton(onClick = onOpenDebug) { Text(stringResource(Res.string.debug_title)) }
             }

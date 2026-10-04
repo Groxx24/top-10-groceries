@@ -17,7 +17,7 @@ UI (Compose)  →  ViewModel  →  Use case  →  Repository interface (domain) 
 Dependencies point inward only: `ui` → `domain` ← `data`. `domain` is plain Kotlin. Shared code
 goes in `app/src/commonMain` and must not use `java.*` or `android.*`; `androidMain` holds only
 `MainActivity`, the application class, the Room database builder (it needs a `Context`), the
-manifest and launcher resources. Dependencies are
+AdMob code in `ads/`, the manifest and launcher resources. Dependencies are
 wired by hand in `di/AppContainer.kt` and nowhere else.
 
 ## Screens
@@ -47,6 +47,14 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   colours, except for what must look the same in both (white logo tiles, medal badges, the
   translucent category tints in `DealPicture`). The pre-Compose window background in
   `androidMain/res/values{,-night}/colors.xml` matches each scheme's `background`.
+- Ads (AdMob, Android only): an anchored adaptive banner under the store list, and nowhere else.
+  `ads/StoresBanner` and `ads/AdsConsent` live in `androidMain`; `MainActivity` hands them to
+  `App` as a `storesBanner` slot and an `onOpenPrivacyOptions` callback, so common code knows
+  nothing of AdMob. Belgium is in the EEA, so `AdsConsent` runs Google's UMP consent form on every
+  start and starts the Mobile Ads SDK only once `canRequestAds()`; until then no banner is drawn.
+  When UMP says privacy options are required, a "Privacy" button in the store list header reopens
+  the form. The AdMob app id is in the manifest; the banner's unit id is in `StoresBanner`, and
+  debug builds use Google's test unit instead so our own taps never count.
 - Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag,
   whether the debug screens are unlocked, and the store being picked for. Back goes one screen
   up; leaving the debug screens locks them again.

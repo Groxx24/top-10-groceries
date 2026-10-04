@@ -4,6 +4,7 @@
     <string name="stores_section">Stores</string>
     <string name="stores_card_hint">See this week’s top 10</string>
     <string name="stores_error_title">Could not load the stores</string>
+    <string name="privacy_options">Privacy</string>
 
     <string name="top_title">Top 10 at %1$s</string>
     <string name="top_title_loading">Top 10</string>

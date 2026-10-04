@@ -50,6 +50,9 @@ kotlin {
             implementation(project.dependencies.platform(libs.firebase.bom))
             // Reports crashes by itself once the app starts; nothing in the code calls it.
             implementation(libs.firebase.crashlytics)
+            // The banner under the store list, and the consent form shown before any ad is requested.
+            implementation(libs.play.services.ads)
+            implementation(libs.ump)
         }
     }
 }

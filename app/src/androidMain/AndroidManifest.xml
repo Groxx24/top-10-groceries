@@ -11,6 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Top10Deals">
+        <!-- The AdMob app id; the SDK refuses to start without it. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-4164526058911953~7723978662" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

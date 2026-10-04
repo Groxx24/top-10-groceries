@@ -4,6 +4,7 @@
     <string name="stores_section">Magasins</string>
     <string name="stores_card_hint">Voir le top 10 de la semaine</string>
     <string name="stores_error_title">Impossible de charger les magasins</string>
+    <string name="privacy_options">Confidentialité</string>
 
     <string name="top_title">Top 10 chez %1$s</string>
     <string name="top_title_loading">Top 10</string>

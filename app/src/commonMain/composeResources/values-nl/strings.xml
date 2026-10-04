@@ -4,6 +4,7 @@
     <string name="stores_section">Winkels</string>
     <string name="stores_card_hint">Bekijk de top 10 van deze week</string>
     <string name="stores_error_title">De winkels konden niet worden geladen</string>
+    <string name="privacy_options">Privacy</string>
 
     <string name="top_title">Top 10 bij %1$s</string>
     <string name="top_title_loading">Top 10</string>

@@ -21,9 +21,17 @@ import com.top10.deals.ui.top.TopOffersRoute
  * ([isDebugBuild]) add a store picker, reached from the store list, that leads to picking that
  * store's top 10 from its weekly deals. Those screens also need the passphrase, asked for each
  * time they are opened.
+ *
+ * Ads come from the platform: [storesBanner] is drawn under the store list, and
+ * [onOpenPrivacyOptions], when not null, lets the user change their consent to ads.
  */
 @Composable
-fun App(container: AppContainer, isDebugBuild: Boolean) {
+fun App(
+    container: AppContainer,
+    isDebugBuild: Boolean,
+    storesBanner: @Composable () -> Unit = {},
+    onOpenPrivacyOptions: (() -> Unit)? = null,
+) {
     Top10Theme {
         var openStoreId by rememberSaveable { mutableStateOf<String?>(null) }
         var debugOpen by rememberSaveable { mutableStateOf(false) }
@@ -57,6 +65,8 @@ fun App(container: AppContainer, isDebugBuild: Boolean) {
                 container,
                 onOpenStore = { openStoreId = it },
                 onOpenDebug = if (isDebugBuild) ({ debugOpen = true }) else null,
+                onOpenPrivacyOptions = onOpenPrivacyOptions,
+                banner = storesBanner,
             )
 
             is Screen.Top -> {
