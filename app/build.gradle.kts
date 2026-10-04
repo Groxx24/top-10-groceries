@@ -81,6 +81,16 @@ android {
         versionName = "1.0"
     }
 
+    buildTypes {
+        release {
+            // R8 drops the unused code of Compose, Firebase and Ads and shortens names; without it
+            // the APK is mostly dex. Crashlytics uploads the mapping file so stack traces still read.
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+
     buildFeatures {
         // BuildConfig.DEBUG decides whether the debug screen can be reached.
         buildConfig = true
