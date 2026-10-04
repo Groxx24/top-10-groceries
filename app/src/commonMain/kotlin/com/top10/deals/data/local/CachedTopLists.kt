@@ -1,5 +1,6 @@
 package com.top10.deals.data.local
 
+import com.top10.deals.domain.model.GenericProduct
 import com.top10.deals.domain.model.Offer
 import com.top10.deals.domain.model.ProductCategory
 import com.top10.deals.domain.model.TopOffers
@@ -115,6 +116,7 @@ class CachedTopLists(
         regularPrice = deal.regularPrice,
         needsLoyaltyCard = deal.needsLoyaltyCard,
         category = deal.category.name,
+        product = deal.product?.name,
         validUntil = deal.validUntil,
     )
 
@@ -131,6 +133,7 @@ class CachedTopLists(
             regularPrice = regularPrice,
             needsLoyaltyCard = needsLoyaltyCard,
             category = ProductCategory.fromName(category),
+            product = GenericProduct.fromName(product),
             validUntil = validUntil,
         ),
     )

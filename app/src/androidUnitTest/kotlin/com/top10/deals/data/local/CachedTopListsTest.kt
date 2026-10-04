@@ -1,6 +1,7 @@
 package com.top10.deals.data.local
 
 import com.top10.deals.data.hardcoded.HardcodedCatalog
+import com.top10.deals.domain.model.GenericProduct
 import com.top10.deals.domain.model.LocalizedText
 import com.top10.deals.domain.model.Offer
 import com.top10.deals.domain.model.ProductCategory
@@ -36,6 +37,7 @@ class CachedTopListsTest {
         assertEquals(1, remote.reads)
         assertEquals(first, second)
         assertEquals(ProductCategory.FRUIT, second.offers.first().deal.category)
+        assertEquals(GenericProduct.BANANAS, second.offers.first().deal.product)
 
         now += 1.days.inWholeMilliseconds // Thursday 8 October: the list is over.
         remote.lists[store.id] = listOf(offer(1, "Apples", until = "14/10"))
@@ -147,7 +149,7 @@ class CachedTopListsTest {
         rank = rank,
         deal = WeeklyDeal(
             id = "delhaize-top-$rank", name = LocalizedText.same(name), brand = null, packageSize = null, label = null,
-            price = 1.49, category = ProductCategory.FRUIT, validUntil = until,
+            price = 1.49, category = ProductCategory.FRUIT, product = GenericProduct.BANANAS, validUntil = until,
         ),
     )
 

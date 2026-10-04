@@ -1,5 +1,6 @@
 package com.top10.deals.data.firebase
 
+import com.top10.deals.domain.model.GenericProduct
 import com.top10.deals.domain.model.LocalizedText
 import com.top10.deals.domain.model.Offer
 import com.top10.deals.domain.model.ProductCategory
@@ -74,6 +75,7 @@ class FirestoreTopLists(
         regularPrice = deal.regularPrice,
         needsLoyaltyCard = deal.needsLoyaltyCard,
         category = deal.category.name,
+        product = deal.product?.name,
         validUntil = deal.validUntil,
     )
 
@@ -90,6 +92,7 @@ class FirestoreTopLists(
             regularPrice = regularPrice,
             needsLoyaltyCard = needsLoyaltyCard,
             category = ProductCategory.fromName(category),
+            product = GenericProduct.fromName(product),
             validUntil = validUntil,
         ),
     )
@@ -126,6 +129,8 @@ private data class TopListEntry(
     val needsLoyaltyCard: Boolean = false,
     /** A [ProductCategory] name; missing in lists published before categories, which show as OTHER. */
     val category: String? = null,
+    /** A [GenericProduct] name; missing for a deal with no photo and in lists published before photos. */
+    val product: String? = null,
     val validUntil: String? = null,
 )
 

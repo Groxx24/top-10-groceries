@@ -78,9 +78,14 @@ prints both); English is always translated. Submitting publishes all three.
 - `Store` is an `id`, a display `name` and a logo. `WeeklyDeal` is a promotion as a store's folder
   prints it; `Offer` is one already-ranked place in a published list (`rank` 1 to 10) holding
   its `WeeklyDeal`, and `ui/deal/DealInfo` draws a deal the same way on both screens.
-- There are no product photos. Each `WeeklyDeal` has a `ProductCategory`, and `ui/deal/DealPicture`
-  draws it as an emoji on a tinted tile, next to the deal on the pick screen and with a rank badge
-  (gold, silver, bronze for the top 3) in the top list. The emoji and tint live only in the UI.
+- There are no photos of the actual products, only generic ones. A `WeeklyDeal` can have a
+  `GenericProduct` (bananas, toilet paper, about 115 everyday products), and `ui/deal/DealPicture`
+  shows its photo (`composeResources/drawable/product_*.webp`, mapped in `ui/deal/ProductPhotos.kt`)
+  next to the deal on the pick screen and with a rank badge (gold, silver, bronze for the top 3) in
+  the top list. A deal with no product shows its `ProductCategory` instead, as an emoji on a tinted
+  tile; the emoji and tint live only in the UI. Every `GenericProduct` has a photo, and every photo
+  is CC0 or public domain, so the app needs no credits screen; `PRODUCT_PHOTOS.md` lists where each
+  came from. A new one is a 256 px square webp under the same rules.
 - `StoreRepository` is implemented by `data/hardcoded/HardcodedCatalog`: five stores (Delhaize,
   Aldi, Lidl, Intermarché, Spar). Moving the stores to Firebase means a Firebase implementation
   swapped in `AppContainer`; nothing above the data layer changes.
@@ -96,8 +101,9 @@ prints both); English is always translated. Submitting publishes all three.
   document per store replaced on each submit, with `storeId`, `storeName`, a server
   `submittedAt`, and `offers`, the 10 picks in the order they were listed (`rank` 1 to 10) with
   only the fields the pick screen shows; `name`, `packageSize` and `label` are `{en, fr, nl}`
-  maps, and `category` is a `ProductCategory` name (missing or unknown reads as `OTHER`, so never
-  rename an entry). A store with no document shows the empty state.
+  maps, `category` is a `ProductCategory` name (missing or unknown reads as `OTHER`, so never
+  rename an entry), and `product` a `GenericProduct` name (missing or unknown shows the category
+  picture, so never rename one either). A store with no document shows the empty state.
 - Top lists are cached on the phone in Room (multiplatform, set up like the other apps):
   `data/local/CachedTopLists` wraps `FirestoreTopLists` as both interfaces and keeps each store's
   offers in `top-lists.db` (`top_offers`, plus `top_lists` with when each was fetched and when it

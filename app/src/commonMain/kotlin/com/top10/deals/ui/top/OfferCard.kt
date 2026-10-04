@@ -22,7 +22,7 @@ fun OfferCard(offer: Offer) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            DealPicture(offer.deal.category, rank = offer.rank)
+            DealPicture(offer.deal, rank = offer.rank)
             DealInfo(offer.deal, Modifier.weight(1f))
         }
     }

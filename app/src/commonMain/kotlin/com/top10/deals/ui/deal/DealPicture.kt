@@ -1,5 +1,6 @@
 package com.top10.deals.ui.deal
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -12,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,27 +49,48 @@ import com.top10.deals.domain.model.ProductCategory.SWEETS
 import com.top10.deals.domain.model.ProductCategory.VEGETABLES
 import com.top10.deals.domain.model.ProductCategory.WATER
 import com.top10.deals.domain.model.ProductCategory.WINE
+import com.top10.deals.domain.model.WeeklyDeal
+import org.jetbrains.compose.resources.painterResource
 
 /**
- * A deal's picture: its category drawn as an emoji on a tile tinted for the kind of product, in
- * place of a product photo. With a [rank], a medal-coloured badge in the corner gives its place.
- * The picture is decorative (the deal's name says what it is), so only the rank is read out.
+ * A deal's picture: a photo of the product when it is an everyday one we have a photo of (see
+ * [photo]), or else its category drawn as an emoji on a tile tinted for the kind of product. With a
+ * [rank], a medal-coloured badge in the corner gives its place. The picture is decorative (the
+ * deal's name says what it is), so only the rank is read out.
  */
 @Composable
-fun DealPicture(category: ProductCategory, modifier: Modifier = Modifier, rank: Int? = null) {
-    val art = category.art()
+fun DealPicture(deal: WeeklyDeal, modifier: Modifier = Modifier, rank: Int? = null) {
+    val photo = deal.product?.photo()
     Box(modifier.size(64.dp)) {
-        Box(
-            modifier = Modifier
-                .size(64.dp)
-                // Translucent, so the same tint reads on the light and the dark theme.
-                .background(art.tint.copy(alpha = 0.22f), RoundedCornerShape(16.dp))
-                .clearAndSetSemantics {},
-            contentAlignment = Alignment.Center,
-        ) {
-            Text(text = art.emoji, fontSize = 32.sp)
+        if (photo != null) {
+            Image(
+                painter = painterResource(photo),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(64.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .clearAndSetSemantics {},
+            )
+        } else {
+            CategoryTile(deal.category)
         }
         if (rank != null) RankBadge(rank, Modifier.align(Alignment.TopStart).offset(x = (-6).dp, y = (-6).dp))
+    }
+}
+
+@Composable
+private fun CategoryTile(category: ProductCategory) {
+    val art = category.art()
+    Box(
+        modifier = Modifier
+            .size(64.dp)
+            // Translucent, so the same tint reads on the light and the dark theme.
+            .background(art.tint.copy(alpha = 0.22f), RoundedCornerShape(16.dp))
+            .clearAndSetSemantics {},
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(text = art.emoji, fontSize = 32.sp)
     }
 }
 

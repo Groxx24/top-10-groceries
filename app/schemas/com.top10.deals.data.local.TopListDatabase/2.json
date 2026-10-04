@@ -1,0 +1,157 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "2e0bbec338a1960ea2054ac903ac91f9",
+    "entities": [
+      {
+        "tableName": "top_lists",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storeId` TEXT NOT NULL, `fetchedAtMillis` INTEGER NOT NULL, `expiresOnEpochDay` INTEGER, PRIMARY KEY(`storeId`))",
+        "fields": [
+          {
+            "fieldPath": "storeId",
+            "columnName": "storeId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fetchedAtMillis",
+            "columnName": "fetchedAtMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "expiresOnEpochDay",
+            "columnName": "expiresOnEpochDay",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "storeId"
+          ]
+        }
+      },
+      {
+        "tableName": "top_offers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`storeId` TEXT NOT NULL, `rank` INTEGER NOT NULL, `brand` TEXT, `price` REAL, `priceUnit` TEXT, `regularPrice` REAL, `needsLoyaltyCard` INTEGER NOT NULL, `category` TEXT NOT NULL, `product` TEXT, `validUntil` TEXT, `name_en` TEXT NOT NULL, `name_fr` TEXT NOT NULL, `name_nl` TEXT NOT NULL, `package_size_en` TEXT, `package_size_fr` TEXT, `package_size_nl` TEXT, `label_en` TEXT, `label_fr` TEXT, `label_nl` TEXT, PRIMARY KEY(`storeId`, `rank`))",
+        "fields": [
+          {
+            "fieldPath": "storeId",
+            "columnName": "storeId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rank",
+            "columnName": "rank",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brand",
+            "columnName": "brand",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "priceUnit",
+            "columnName": "priceUnit",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "regularPrice",
+            "columnName": "regularPrice",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "needsLoyaltyCard",
+            "columnName": "needsLoyaltyCard",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "product",
+            "columnName": "product",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "validUntil",
+            "columnName": "validUntil",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name.en",
+            "columnName": "name_en",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name.fr",
+            "columnName": "name_fr",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name.nl",
+            "columnName": "name_nl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageSize.en",
+            "columnName": "package_size_en",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "packageSize.fr",
+            "columnName": "package_size_fr",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "packageSize.nl",
+            "columnName": "package_size_nl",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "label.en",
+            "columnName": "label_en",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "label.fr",
+            "columnName": "label_fr",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "label.nl",
+            "columnName": "label_nl",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "storeId",
+            "rank"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2e0bbec338a1960ea2054ac903ac91f9')"
+    ]
+  }
+}

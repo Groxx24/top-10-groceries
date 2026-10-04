@@ -11,7 +11,7 @@ import kotlinx.coroutines.IO
 const val TopListDatabaseFileName = "top-lists.db"
 
 /** The top lists last read from Firestore, kept on the phone so opening a store does not read them again. */
-@Database(entities = [CachedTopListEntity::class, CachedOfferEntity::class], version = 1)
+@Database(entities = [CachedTopListEntity::class, CachedOfferEntity::class], version = 2)
 @ConstructedBy(TopListDatabaseConstructor::class)
 abstract class TopListDatabase : RoomDatabase() {
     abstract fun topListDao(): TopListDao

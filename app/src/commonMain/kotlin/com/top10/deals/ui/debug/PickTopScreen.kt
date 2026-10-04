@@ -164,7 +164,7 @@ private fun DealRow(deal: WeeklyDeal, selected: Boolean, enabled: Boolean, onTog
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(checked = selected, onCheckedChange = { onToggle() }, enabled = enabled)
-            DealPicture(deal.category)
+            DealPicture(deal)
             DealInfo(deal, Modifier.weight(1f))
         }
     }

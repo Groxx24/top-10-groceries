@@ -29,5 +29,7 @@ data class CachedOfferEntity(
     val needsLoyaltyCard: Boolean,
     /** A `ProductCategory` name. */
     val category: String,
+    /** A `GenericProduct` name, or null when the deal has no photo. */
+    val product: String?,
     val validUntil: String?,
 )
