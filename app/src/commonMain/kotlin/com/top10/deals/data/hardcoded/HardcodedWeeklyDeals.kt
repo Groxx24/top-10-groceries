@@ -184,6 +184,19 @@ class HardcodedWeeklyDeals : WeeklyDealsRepository {
                     deal(PERSONAL_CARE, t("Toothpaste", "Dentifrice", "Tandpasta"), "Sensodyne", null, free("2+2"), null, until = "07/10", product = GenericProduct.TOOTHPASTE),
                 ) + madeUp(8, except = setOf("Jonagold apples", "Greek yoghurt", "Penne rigate")),
             ),
+            // From promotiez.be on 4 October 2026: the folder valid 30/09 to 12/10 and the end of the
+            // 23/09 to 05/10 one. The site gives no original prices.
+            "carrefour" to deals(
+                "carrefour",
+                listOf(
+                    deal(DAIRY, t("Greek-style yoghurt", "Spécialité laitière à la grecque", "Griekse zuivelspecialiteit"), "Danone", same("2 x (4 x 110 g)"), null, 2.95, until = "12/10", product = GenericProduct.YOGHURT),
+                    deal(WATER, t("Natural mineral water", "Eau minérale naturelle", "Natuurlijk mineraalwater"), "Evian", t("4 x (6 x 1.5 L)", "4 x (6 x 1,5 L)", "4 x (6 x 1,5 L)"), null, 11.10, until = "12/10", product = GenericProduct.WATER),
+                    deal(BABY, t("Baby-Dry pants and wipes", "Culottes Baby-Dry et lingettes", "Broekjes Baby-Dry en doekjes"), "Pampers", null, null, 7.18, until = "12/10"),
+                    deal(PASTA, t("Extra virgin olive oil Classico", "Huile d’olive vierge extra Classico", "Extra zuivere olijfolie Classico"), "De Cecco", same("2 x 1 L"), null, 12.19, until = "05/10", product = GenericProduct.OLIVE_OIL),
+                    deal(DAIRY, t("Soya drinks", "Boissons au soja", "Plantaardige dranken met soja"), "Alpro", same("2 x (6 x 250 ml)"), null, 5.45, until = "05/10"),
+                    deal(COFFEE_TEA, t("Ground coffee Excellent", "Café moulu Excellent", "Gemalen koffie Excellent"), "Douwe Egberts", same("6 x 250 g"), null, 21.87, until = "05/10", product = GenericProduct.GROUND_COFFEE),
+                ) + madeUp(14, except = setOf("Greek yoghurt", "Ground coffee")),
+            ),
         )
 
         /** [count] made-up staples, leaving out those named (in English) in [except]. */

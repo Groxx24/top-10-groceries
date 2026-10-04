@@ -86,8 +86,8 @@ prints both); English is always translated. Submitting publishes all three.
   tile; the emoji and tint live only in the UI. Every `GenericProduct` has a photo, and every photo
   is CC0 or public domain, so the app needs no credits screen; `PRODUCT_PHOTOS.md` lists where each
   came from. A new one is a 256 px square webp under the same rules.
-- `StoreRepository` is implemented by `data/hardcoded/HardcodedCatalog`: five stores (Delhaize,
-  Aldi, Lidl, Intermarché, Spar). Moving the stores to Firebase means a Firebase implementation
+- `StoreRepository` is implemented by `data/hardcoded/HardcodedCatalog`: six stores (Delhaize,
+  Aldi, Lidl, Intermarché, Spar, Carrefour). Moving the stores to Firebase means a Firebase implementation
   swapped in `AppContainer`; nothing above the data layer changes.
 - `WeeklyDealsRepository` gives a store's deals of the week, most relevant first; the debug flow
   offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` is typed in by
