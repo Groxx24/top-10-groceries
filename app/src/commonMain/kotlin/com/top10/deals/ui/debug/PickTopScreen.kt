@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.top10.deals.di.AppContainer
+import com.top10.deals.di.DebugContainer
 import com.top10.deals.domain.model.TOP_LIST_SIZE
 import com.top10.deals.domain.model.WeeklyDeal
 import com.top10.deals.resources.Res
@@ -52,7 +52,7 @@ import com.top10.deals.ui.deal.DealPicture
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun PickTopRoute(container: AppContainer, storeId: String, onBack: () -> Unit) {
+fun PickTopRoute(container: DebugContainer, storeId: String, onBack: () -> Unit) {
     val viewModel = viewModel(key = "pick-top-$storeId") {
         PickTopViewModel(storeId, container.getWeeklyDeals, container.submitTopList)
     }

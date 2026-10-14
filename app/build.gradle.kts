@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -81,8 +82,26 @@ android {
         versionName = "1.0"
     }
 
+    // The upload key Play App Signing checks uploads against. keystore.properties (storeFile,
+    // storePassword, keyAlias, keyPassword) and the keystore stay out of git; without them a
+    // release build is just left unsigned.
+    val keystoreProperties = rootProject.file("keystore.properties")
+        .takeIf { it.exists() }
+        ?.let { file -> Properties().apply { file.inputStream().use(::load) } }
+    signingConfigs {
+        if (keystoreProperties != null) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.findByName("release")
             // R8 drops the unused code of Compose, Firebase and Ads and shortens names; without it
             // the APK is mostly dex. Crashlytics uploads the mapping file so stack traces still read.
             isMinifyEnabled = true

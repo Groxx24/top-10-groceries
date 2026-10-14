@@ -18,7 +18,8 @@ Dependencies point inward only: `ui` → `domain` ← `data`. `domain` is plain 
 goes in `app/src/commonMain` and must not use `java.*` or `android.*`; `androidMain` holds only
 `MainActivity`, the application class, the Room database builder (it needs a `Context`), the
 AdMob code in `ads/`, the manifest and launcher resources. Dependencies are
-wired by hand in `di/AppContainer.kt` and nowhere else.
+wired by hand in `di/` and nowhere else: `AppContainer` for the app, `DebugContainer` for what
+only the debug screens use.
 
 ## Screens
 
@@ -36,9 +37,13 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   dialog) runs `DeleteEndedTopListsUseCase`: it reads every document in `topLists` through
   `PublishedTopLists` and deletes, one by one, each list that has ended (see
   `domain/model/TopListEnd.kt`), then names the stores it deleted.
-  Reached from a "Debug" button in the store list header. `MainActivity` passes
-  `BuildConfig.DEBUG` to `App` as `isDebugBuild`; when it is false the button is not shown and
-  none of these screens can be reached. Even in a debug build they open only after
+  Reached from a "Debug" button in the store list header. `ui/debug/DebugScreens` holds their
+  navigation and state; only when `BuildConfig.DEBUG` does `MainActivity` create a
+  `DebugContainer` and hand `DebugScreens` to `App` as its `debugScreens` slot. In a release build
+  the slot is null, so the button is not shown, and since nothing then refers to the debug
+  screens, R8 drops them, their wiring, the hand-typed deals and the publisher's email from the
+  release app; keep it that way (nothing outside `MainActivity` may refer to `DebugContainer` or
+  `ui/debug`). Even in a debug build they open only after
   `UnlockScreen` gets the passphrase, asked again each time the debug screens are opened.
 - ViewModels are kept for the whole session (keyed by store id), so a screen whose data can
   change in between asks again each time it opens: `TopOffersRoute` calls
@@ -60,9 +65,9 @@ wired by hand in `di/AppContainer.kt` and nowhere else.
   When UMP says privacy options are required, a "Privacy" button in the store list header reopens
   the form. The AdMob app id is in the manifest; the banners' unit ids are in `Banners.kt`,
   and debug builds use Google's test unit instead so our own taps never count.
-- Navigation is `rememberSaveable` state in `ui/App.kt`: the open store id, plus a debug flag,
-  whether the debug screens are unlocked, and the store being picked for. Back goes one screen
-  up; leaving the debug screens locks them again.
+- Navigation is `rememberSaveable` state: in `ui/App.kt` the open store id and whether the debug
+  screens are open; in `DebugScreens` whether they are unlocked and the store being picked for,
+  forgotten on leaving them, so they lock again. Back goes one screen up.
 
 ## Languages
 
@@ -140,13 +145,21 @@ prints both); English is always translated. Submitting publishes all three.
 
 ## Build
 
-Use Android Studio's bundled JDK; the system default is too new for this Gradle version:
+Use JDK 21 (JetBrains Runtime 21 here); the system default and Android Studio's bundled JDK (25)
+are too new for this Gradle version:
 
 ```sh
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+export JAVA_HOME="$HOME/Library/Java/JavaVirtualMachines/jbr-21.0.11/Contents/Home"
 ./gradlew :app:assembleDebug
 ./gradlew :app:testDebugUnitTest
+./gradlew :app:bundleRelease   # the .aab for Play, minified by R8
 ```
+
+A release build is signed with the upload key named in `keystore.properties` at the project root
+(`storeFile`, `storePassword`, `keyAlias`, `keyPassword`); it and the keystore are gitignored, and
+without them the bundle comes out unsigned. Play App Signing holds the real app signing key.
+Raise `versionCode` in `app/build.gradle.kts` for every upload to Play.
+Nothing is backed up or moved to a new phone (`allowBackup="false"`, `res/xml/data_extraction_rules.xml`).
 
 Library versions in `gradle/libs.versions.toml` match the other apps here and are pinned for the
 same reason: Android Gradle Plugin 8.13 and compile SDK 36. Unlike the other apps, this one

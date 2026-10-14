@@ -32,7 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.top10.deals.di.AppContainer
+import com.top10.deals.di.DebugContainer
 import com.top10.deals.resources.Res
 import com.top10.deals.resources.cancel
 import com.top10.deals.resources.debug_delete_ended
@@ -53,7 +53,7 @@ import org.jetbrains.compose.resources.stringResource
 
 /** Tools for debug builds only; the store list shows its entry point only when the build is debuggable. */
 @Composable
-fun DebugRoute(container: AppContainer, onBack: () -> Unit, onPickStore: (storeId: String) -> Unit) {
+fun DebugRoute(container: DebugContainer, onBack: () -> Unit, onPickStore: (storeId: String) -> Unit) {
     // Same key as the store list's, so both screens share one loaded list.
     val viewModel = viewModel { StoresViewModel(container.getStores) }
     val state by viewModel.state.collectAsStateWithLifecycle()

@@ -32,7 +32,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.top10.deals.di.AppContainer
+import com.top10.deals.di.DebugContainer
 import com.top10.deals.resources.Res
 import com.top10.deals.resources.debug_title
 import com.top10.deals.resources.unlock_button
@@ -45,7 +45,7 @@ import org.jetbrains.compose.resources.stringResource
 
 /** Asks for the passphrase before the debug screens; [onUnlocked] once it is right. */
 @Composable
-fun UnlockRoute(container: AppContainer, onUnlocked: () -> Unit, onBack: () -> Unit) {
+fun UnlockRoute(container: DebugContainer, onUnlocked: () -> Unit, onBack: () -> Unit) {
     val viewModel = viewModel { UnlockViewModel(container.unlockDebug) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.unlocked) {
