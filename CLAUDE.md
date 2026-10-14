@@ -90,7 +90,11 @@ prints both); English is always translated. Submitting publishes all three.
   is CC0 or public domain, so the app needs no credits screen; `PRODUCT_PHOTOS.md` lists where each
   came from. A new one is a 256 px square webp under the same rules.
 - `StoreRepository` is implemented by `data/hardcoded/HardcodedCatalog`: six stores (Delhaize,
-  Aldi, Lidl, Intermarché, Spar, Carrefour). Moving the stores to Firebase means a Firebase implementation
+  Aldi, Lidl, Intermarché, Spar, Carrefour). Their logos are Wikimedia Commons thumbnails loaded at
+  runtime, each one public domain (too simple for copyright) in Belgium as well as the US;
+  `STORE_LOGOS.md` lists their sources. A store whose logo may still be protected, like Carrefour's,
+  has none and shows its first letter. The names and logos stay their owners' trademarks, so the
+  store list ends with a line (`stores_disclaimer`) saying the app is not affiliated with them. Moving the stores to Firebase means a Firebase implementation
   swapped in `AppContainer`; nothing above the data layer changes.
 - `WeeklyDealsRepository` gives a store's deals of the week, most relevant first; the debug flow
   offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` is typed in by

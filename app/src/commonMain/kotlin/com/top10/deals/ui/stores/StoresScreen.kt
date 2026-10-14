@@ -40,6 +40,7 @@ import com.top10.deals.resources.Res
 import com.top10.deals.resources.debug_title
 import com.top10.deals.resources.privacy_options
 import com.top10.deals.resources.stores_card_hint
+import com.top10.deals.resources.stores_disclaimer
 import com.top10.deals.resources.stores_error_title
 import com.top10.deals.resources.stores_hint
 import com.top10.deals.resources.stores_section
@@ -122,6 +123,15 @@ fun StoreList(
                 }
                 items(state.stores, key = { it.id }) { store ->
                     StoreCard(store = store, onClick = { onOpenStore(store.id) })
+                }
+                // The stores' names and logos are theirs; say the app is not theirs.
+                item {
+                    Text(
+                        text = stringResource(Res.string.stores_disclaimer),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 4.dp, end = 4.dp, top = 10.dp),
+                    )
                 }
             }
         }
