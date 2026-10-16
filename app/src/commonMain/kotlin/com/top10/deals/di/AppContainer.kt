@@ -8,6 +8,7 @@ import com.top10.deals.data.local.TopListDatabase
 import com.top10.deals.data.local.buildTopListDatabase
 import com.top10.deals.domain.repository.StoreRepository
 import com.top10.deals.domain.usecase.GetStoresUseCase
+import com.top10.deals.domain.usecase.GetStoresWithOffersUseCase
 import com.top10.deals.domain.usecase.GetTopOffersUseCase
 import dev.gitlive.firebase.Firebase
 import dev.gitlive.firebase.firestore.firestore
@@ -43,6 +44,8 @@ class AppContainer(databaseBuilder: RoomDatabase.Builder<TopListDatabase>) {
 
     val getStores = GetStoresUseCase(storeRepository)
     val getTopOffers by lazy { GetTopOffersUseCase(topLists) }
+    // Reads every list at once, so the store list shows only stores with one and opening them is cached.
+    val getStoresWithOffers by lazy { GetStoresWithOffersUseCase(storeRepository, topLists) }
 
     /** Today in Belgium, which is when the deals' "valid until" dates end. */
     internal fun today() = Clock.System.now().toLocalDateTime(TimeZone.of("Europe/Brussels")).date

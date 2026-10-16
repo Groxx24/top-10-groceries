@@ -145,6 +145,38 @@ class CachedTopListsTest {
     }
 
     // Named the way Firestore and the cache name a published offer, so read-backs compare equal.
+    @Test
+    fun `all lists are read at once and cached, so opening a store reads nothing more`() = runTest {
+        val (delhaize, aldi, lidl) = catalog.stores()
+        remote.lists[delhaize.id] = listOf(offer(1, "Bananas", until = "07/10"))
+        remote.lists[aldi.id] = listOf(offer(1, "Avocados", until = "30/09")) // already ended
+        remote.lists[lidl.id] = emptyList()
+
+        val all = topLists.allTopOffers()
+
+        assertEquals(listOf(delhaize.id), all.map { it.store.id })
+        assertEquals(listOf("Bananas"), topLists.topOffers(delhaize.id).offers.map { it.deal.name.en })
+        assertEquals(1, remote.reads)
+    }
+
+    @Test
+    fun `offline, all lists are the cached ones that have not ended`() = runTest {
+        val (delhaize, aldi) = catalog.stores()
+        remote.lists[delhaize.id] = listOf(offer(1, "Bananas", until = "07/10"))
+        remote.lists[aldi.id] = listOf(offer(1, "Apples", until = "02/10"))
+        topLists.allTopOffers()
+
+        remote.failing = true
+        now += 2.days.inWholeMilliseconds // Saturday 3 October: the apples have ended.
+        assertEquals(listOf(delhaize.id), topLists.allTopOffers().map { it.store.id })
+    }
+
+    @Test
+    fun `offline with nothing cached, reading all lists fails`() = runTest {
+        remote.failing = true
+        assertTrue(runCatching { topLists.allTopOffers() }.isFailure)
+    }
+
     private fun offer(rank: Int, name: String, until: String? = "07/10") = Offer(
         rank = rank,
         deal = WeeklyDeal(
@@ -163,6 +195,14 @@ class CachedTopListsTest {
             reads++
             if (failing) error("offline")
             return TopOffers(catalog.stores().first { it.id == storeId }, lists[storeId].orEmpty())
+        }
+
+        override suspend fun allTopOffers(): List<TopOffers> {
+            reads++
+            if (failing) error("offline")
+            return lists.filterValues { it.isNotEmpty() }.map { (storeId, offers) ->
+                TopOffers(catalog.stores().first { it.id == storeId }, offers)
+            }
         }
 
         override suspend fun publish(top: TopOffers) {

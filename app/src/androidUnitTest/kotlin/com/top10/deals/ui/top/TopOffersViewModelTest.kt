@@ -33,6 +33,8 @@ class TopOffersViewModelTest {
         var published: List<Offer> = emptyList()
         override suspend fun topOffers(storeId: String) =
             TopOffers(runBlocking { catalog.stores() }.first { it.id == storeId }, published)
+
+        override suspend fun allTopOffers() = error("not used")
     }
 
     @Test

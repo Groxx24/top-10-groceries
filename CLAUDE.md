@@ -23,11 +23,16 @@ only the debug screens use.
 
 ## Screens
 
-- `ui/stores/`: the entry point, a list of stores from `GetStoresUseCase`.
+- `ui/stores/`: the entry point, the stores that have a top list this week, from
+  `GetStoresWithOffersUseCase`: one Firestore query reads every list (`allTopOffers`), and a store
+  with no list, or one that has ended, is left out; when the lists cannot be read at all, every
+  store is shown. With none left it says the new lists are on their way. The list is read again
+  when the debug screens are left (`App` passes a `refreshKey`) or after `StoresViewModel.MAX_AGE`
+  (1 hour).
 - `ui/top/`: the top list of one store, opened with its `storeId` and loaded through
   `GetTopOffersUseCase(storeId)`. Nothing in the UI or domain is specific to a store.
 - `ui/debug/`: debug builds only. A store picker (the same `StoreList` composable as the store
-  list, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
+  list, but every store, from `GetStoresUseCase`, with its own ViewModel key, under "Pick a store to submit 10 products for") leads to `PickTopScreen`: that store's 20
   candidate deals from `GetWeeklyDealsUseCase(storeId)` (deals already ended are dropped and the
   next ones take their place; under 10 left, the screen says so instead), a multi-select capped at exactly
   `TOP_LIST_SIZE` (10) that keeps the order of the taps (the first one picked is number 1, shown as
@@ -133,8 +138,10 @@ prints both); English is always translated. Submitting publishes all three.
   reads Firestore again, so ended deals are never shown, even offline. A list with no readable
   `validUntil` is read again after `CachedTopLists.MAX_AGE` (12 hours). A store with no list
   published is not cached, so it is read from Firestore on every open until one is. When Firestore fails, a copy that has not ended is shown instead of an error, and a
-  submit writes the new list straight into the cache. Other phones only see a resubmitted list
-  once their copy has ended. The database is only a cache, so a schema change drops it (no migrations); its schema is
+  submit writes the new list straight into the cache. The store list's `allTopOffers` always asks
+  Firestore for every list (at most one read per store) and caches each answer the same way, so
+  opening a store afterwards reads nothing, and a resubmitted list reaches other phones the next
+  time their store list loads; offline it gives the cached lists that have not ended. The database is only a cache, so a schema change drops it (no migrations); its schema is
   still exported to `app/schemas/`, which is committed.
 - `DebugLock` guards the debug screens. `data/firebase/FirebaseDebugLock` signs in to Firebase
   Auth as the publisher account (`FirebaseDebugLock.PUBLISHER_EMAIL`, made by hand in the Firebase

@@ -5,6 +5,8 @@
     <string name="stores_card_hint">Bekijk de top 10 van deze week</string>
     <string name="stores_error_title">De winkels konden niet worden geladen</string>
     <string name="stores_disclaimer">Niet verbonden met of goedgekeurd door de getoonde winkels. Hun namen en logo’s zijn merken van hun respectieve eigenaars.</string>
+    <string name="stores_none_title">Nog niets deze week</string>
+    <string name="stores_none_hint">De nieuwe toplijsten komen eraan. Kijk straks nog eens.</string>
     <string name="privacy_options">Privacy</string>
 
     <string name="top_title">Top 10 bij %1$s</string>

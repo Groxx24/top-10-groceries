@@ -2,6 +2,7 @@ package com.top10.deals.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -32,10 +33,15 @@ fun App(
     Top10Theme {
         var openStoreId by rememberSaveable { mutableStateOf<String?>(null) }
         var debugOpen by rememberSaveable { mutableStateOf(false) }
+        // Counts the visits to the debug screens, so the store list reads the stores again after one.
+        var debugVisits by rememberSaveable { mutableIntStateOf(0) }
         val closeStore = { openStoreId = null }
         val storeId = openStoreId
         when {
-            debugScreens != null && debugOpen -> debugScreens { debugOpen = false }
+            debugScreens != null && debugOpen -> debugScreens {
+                debugOpen = false
+                debugVisits++
+            }
 
             storeId != null -> {
                 OnBack(closeStore)
@@ -48,6 +54,7 @@ fun App(
                 onOpenDebug = if (debugScreens != null) ({ debugOpen = true }) else null,
                 onOpenPrivacyOptions = onOpenPrivacyOptions,
                 banner = storesBanner,
+                refreshKey = debugVisits,
             )
         }
     }

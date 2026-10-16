@@ -54,8 +54,8 @@ import org.jetbrains.compose.resources.stringResource
 /** Tools for debug builds only; the store list shows its entry point only when the build is debuggable. */
 @Composable
 fun DebugRoute(container: DebugContainer, onBack: () -> Unit, onPickStore: (storeId: String) -> Unit) {
-    // Same key as the store list's, so both screens share one loaded list.
-    val viewModel = viewModel { StoresViewModel(container.getStores) }
+    // Every store, with a list or not, so one can be published for any of them.
+    val viewModel = viewModel(key = "debug-stores") { StoresViewModel(loadStores = { container.getStores() }) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val deleteEndedViewModel = viewModel { DeleteEndedViewModel(container.deleteEndedTopLists) }
     val deleteEnded by deleteEndedViewModel.status.collectAsStateWithLifecycle()

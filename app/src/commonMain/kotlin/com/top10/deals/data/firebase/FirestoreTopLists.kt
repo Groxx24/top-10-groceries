@@ -21,8 +21,9 @@ import kotlinx.serialization.Serializable
  * The stores' top lists in Firestore, one document per store at `topLists/{storeId}`, replaced on
  * every submit. Each entry holds what the pick screen shows for a deal, nothing more, with the
  * name, pack size and label in English, French and Dutch. The store
- * itself comes from [stores], so a store without a document has an empty list. The debug screen
- * also reads all of them at once and deletes the ended ones, as [PublishedTopLists].
+ * itself comes from [stores], so a store without a document has an empty list. The store list
+ * reads all of them at once ([allTopOffers]) to show only stores with a list, and the debug screen
+ * reads them the same way to delete the ended ones, as [PublishedTopLists].
  */
 class FirestoreTopLists(
     private val firestore: FirebaseFirestore,
@@ -34,6 +35,12 @@ class FirestoreTopLists(
         val snapshot = document(storeId).get()
         if (!snapshot.exists) return TopOffers(store, emptyList())
         return TopOffers(store, snapshot.data<TopListDocument>().offers(storeId))
+    }
+
+    /** One query for every list, the same one the debug screen cleans up with, minus unknown stores. */
+    override suspend fun allTopOffers(): List<TopOffers> {
+        val known = stores.stores().map { it.id }.toSet()
+        return all().filter { it.store.id in known && it.offers.isNotEmpty() }
     }
 
     override suspend fun all(): List<TopOffers> {

@@ -32,6 +32,10 @@ import kotlin.time.Instant
  * cached at all, so it is read from Firestore every time until one is. When
  * [remote] fails, a copy that has not ended yet is shown rather than an error. Publishing writes
  * through, so the new list is cached at once.
+ *
+ * [allTopOffers] always asks [remote] for every list at once and caches each answer as
+ * [topOffers] would, so the stores opened afterwards are served from the cache. Offline, it gives
+ * the cached lists that have not ended, and fails only when there are none.
  */
 @OptIn(ExperimentalTime::class)
 class CachedTopLists(
@@ -61,6 +65,27 @@ class CachedTopLists(
         val shown = if (top.hasEnded(today())) TopOffers(store, emptyList()) else top
         save(shown)
         return shown
+    }
+
+    override suspend fun allTopOffers(): List<TopOffers> {
+        val catalogue = stores.stores()
+        val lists = try {
+            remote.allTopOffers().associateBy { it.store.id }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            val cached = catalogue.mapNotNull { store ->
+                cachedListNotEnded(store.id)?.let { TopOffers(store, cachedOffers(store.id)) }
+            }
+            if (cached.isEmpty()) throw e
+            return cached
+        }
+        val today = today()
+        return catalogue.mapNotNull { store ->
+            val top = lists[store.id]?.takeUnless { it.hasEnded(today) } ?: TopOffers(store, emptyList())
+            save(top)
+            top.takeIf { it.offers.isNotEmpty() }
+        }
     }
 
     override suspend fun publish(top: TopOffers) {

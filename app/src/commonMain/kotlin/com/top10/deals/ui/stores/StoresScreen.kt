@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +44,14 @@ import com.top10.deals.resources.stores_card_hint
 import com.top10.deals.resources.stores_disclaimer
 import com.top10.deals.resources.stores_error_title
 import com.top10.deals.resources.stores_hint
+import com.top10.deals.resources.stores_none_hint
+import com.top10.deals.resources.stores_none_title
 import com.top10.deals.resources.stores_section
 import com.top10.deals.resources.stores_title
 import com.top10.deals.ui.BackArrow
 import com.top10.deals.ui.ErrorMessage
 import com.top10.deals.ui.LoadingMessage
+import com.top10.deals.ui.Message
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -57,9 +61,13 @@ fun StoresRoute(
     onOpenDebug: (() -> Unit)?,
     onOpenPrivacyOptions: (() -> Unit)?,
     banner: @Composable () -> Unit,
+    /** Changes when the stores may have changed (the debug screens were left), to read them again. */
+    refreshKey: Int = 0,
 ) {
-    val viewModel = viewModel { StoresViewModel(container.getStores) }
+    val viewModel = viewModel(key = "stores") { StoresViewModel(loadStores = { container.getStoresWithOffers() }) }
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // Kept for the whole session, so it is asked again each time the screen shows.
+    LaunchedEffect(refreshKey) { viewModel.onOpened(refreshKey) }
     StoresScreen(
         state = state,
         onRetry = viewModel::onRetry,
@@ -108,6 +116,11 @@ fun StoreList(
         when {
             state.loadFailed -> ErrorMessage(stringResource(Res.string.stores_error_title), onRetry)
             state.isLoading -> LoadingMessage()
+            // No store has a list this week, for instance before the new ones are published.
+            state.stores.isEmpty() -> Message(
+                title = stringResource(Res.string.stores_none_title),
+                hint = stringResource(Res.string.stores_none_hint),
+            )
 
             else -> LazyColumn(
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 16.dp),
