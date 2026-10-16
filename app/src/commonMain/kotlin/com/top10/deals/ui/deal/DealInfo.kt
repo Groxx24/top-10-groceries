@@ -31,34 +31,30 @@ import org.jetbrains.compose.resources.stringResource
 import kotlin.math.roundToInt
 
 /**
- * A deal as the folder gives it, in the phone's language: its brand as the title with what the
- * product is below it (or that as the title when there is no brand), the pack size, the deal
- * label, and the prices. The pick screen and the published top list both show deals this way.
+ * A deal as the folder gives it, in the phone's language: what the product is as the title, its
+ * brand and pack size below it, the deal label, and the prices. The pick screen and the published
+ * top list both show deals this way.
  */
 @Composable
 fun DealInfo(deal: WeeklyDeal, modifier: Modifier = Modifier) {
     // The phone's language, falling back to English like the app's own strings do.
     val language = Locale.current.language
     Column(modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        val name = deal.name.inLanguage(language)
         Text(
-            text = deal.brand ?: name,
+            text = deal.name.inLanguage(language),
             style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.SemiBold,
         )
-        Description(description = name.takeIf { deal.brand != null }, size = deal.packageSize?.inLanguage(language))
+        Description(brand = deal.brand, size = deal.packageSize?.inLanguage(language))
         DealLabel(deal, language)
         DealDetails(deal)
     }
 }
 
-/**
- * "Cheese · 180 g" under a branded deal's brand, or only the pack size when the deal has no brand
- * and its description is already the title.
- */
+/** "Old Amsterdam · 125 g or 150 g" under the product's name, with only the parts the folder gives. */
 @Composable
-private fun Description(description: String?, size: String?) {
-    val parts = listOfNotNull(description, size)
+private fun Description(brand: String?, size: String?) {
+    val parts = listOfNotNull(brand, size)
     if (parts.isEmpty()) return
     Text(
         text = parts.joinToString(SEPARATOR),
