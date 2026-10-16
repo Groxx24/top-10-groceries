@@ -102,11 +102,18 @@ prints both); English is always translated. Submitting publishes all three.
   store list ends with a line (`stores_disclaimer`) saying the app is not affiliated with them. Moving the stores to Firebase means a Firebase implementation
   swapped in `AppContainer`; nothing above the data layer changes.
 - `WeeklyDealsRepository` gives a store's deals of the week, most relevant first; the debug flow
-  offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` is typed in by
-  hand for week 40 of 2026: Delhaize's from its own folder (the PDF behind folder-fr.delhaize.be),
-  ALDI's (week 41) from its own offers page (aldi.be/aanbiedingen and /offres, whose
-  `validUntilLocalDate` is the day after the last one), the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
-  the sites showed fewer than 20. Scraping would replace it.
+  offers the first `CANDIDATE_COUNT` (20). `data/hardcoded/HardcodedWeeklyDeals` holds them in
+  code, so new deals mean rebuilding the debug app. Lidl's are generated: `python3
+  tools/lidl_deals.py` (standard library only; `--dry-run` only prints the ranking) reads lidl.be's
+  "offers this week" pages in Dutch and French and rewrites `LidlWeeklyDeals.kt` with up to 40
+  deals, ranked by discount with everyday products first and at most 3 per category on top;
+  English names are the French ones (no translation service), and deals it cannot give a category
+  are left out. Delhaize's are typed in by hand each week from its folder,
+  `folder-fr.delhaize.be/w{week}-{year}-fr/` (and `-nl`): the folder PDF's text has the names,
+  sizes and price pairs, the page images the labels. ALDI's (week 41) come from its own offers page
+  (aldi.be/aanbiedingen and /offres, whose `validUntilLocalDate` is the day after the last one),
+  the other stores' from Belgian folder sites, unchecked and padded with made-up staples where
+  the sites showed fewer than 20.
 - Top lists are in Firestore. `data/firebase/FirestoreTopLists` is both the `TopOffersRepository`
   the app reads and the `TopListPublisher` and `PublishedTopLists` the debug screen writes and
   cleans up: `topLists/{storeId}`, one

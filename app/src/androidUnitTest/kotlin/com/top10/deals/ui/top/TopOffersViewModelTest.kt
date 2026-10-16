@@ -1,7 +1,7 @@
 package com.top10.deals.ui.top
 
 import com.top10.deals.data.hardcoded.HardcodedCatalog
-import com.top10.deals.data.hardcoded.HardcodedWeeklyDeals
+import com.top10.deals.fakeDeals
 import com.top10.deals.domain.model.Offer
 import com.top10.deals.domain.model.TopOffers
 import com.top10.deals.domain.repository.TopOffersRepository
@@ -43,8 +43,7 @@ class TopOffersViewModelTest {
         viewModel.onOpened()
         assertEquals(emptyList<Offer>(), viewModel.state.value.top?.offers)
 
-        val deals = runBlocking { HardcodedWeeklyDeals().weeklyDeals("aldi") }
-        topLists.published = deals.take(10).mapIndexed { index, deal -> Offer(index + 1, deal) }
+        topLists.published = fakeDeals(10).mapIndexed { index, deal -> Offer(index + 1, deal) }
         viewModel.onOpened()
 
         assertEquals(10, viewModel.state.value.top?.offers?.size)

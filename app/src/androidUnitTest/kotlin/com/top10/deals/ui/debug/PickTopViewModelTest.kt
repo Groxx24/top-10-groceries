@@ -1,7 +1,7 @@
 package com.top10.deals.ui.debug
 
+import com.top10.deals.FakeWeeklyDeals
 import com.top10.deals.data.hardcoded.HardcodedCatalog
-import com.top10.deals.data.hardcoded.HardcodedWeeklyDeals
 import com.top10.deals.domain.model.TOP_LIST_SIZE
 import com.top10.deals.domain.model.TopOffers
 import com.top10.deals.domain.repository.TopListPublisher
@@ -41,7 +41,7 @@ class PickTopViewModelTest {
 
     private fun viewModel(publisher: TopListPublisher = FakePublisher()) = PickTopViewModel(
         "delhaize",
-        GetWeeklyDealsUseCase(HardcodedCatalog(), HardcodedWeeklyDeals()) { LocalDate(2026, 10, 1) },
+        GetWeeklyDealsUseCase(HardcodedCatalog(), FakeWeeklyDeals()) { LocalDate(2026, 10, 1) },
         SubmitTopListUseCase(publisher),
     )
 

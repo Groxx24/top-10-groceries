@@ -35,11 +35,12 @@ import com.top10.deals.domain.model.WeeklyDeal
 import com.top10.deals.domain.repository.WeeklyDealsRepository
 
 /**
- * This week's deals per store, typed in by hand until they are scraped, in English, French and
- * Dutch. Delhaize's are copied from its own folders and ALDI's from its own offers page: French
- * and Dutch exactly as each store prints them, English translated. The other stores' come from
- * Belgian folder sites as they listed them on 3 October 2026, are not checked against the folders,
- * and are translated by hand into all three languages; the rest are made up (see [madeUp]) to make 20.
+ * This week's deals per store, in English, French and Dutch. Lidl's are written by
+ * `tools/lidl_deals.py` from lidl.be into [LIDL_WEEKLY_DEALS]. The others are typed in by hand:
+ * Delhaize's copied from its own folders and ALDI's from its own offers page, French and Dutch
+ * exactly as each store prints them, English translated. The other stores' come from Belgian
+ * folder sites as they listed them on 3 October 2026, are not checked against the folders, and are
+ * translated by hand into all three languages; the rest are made up (see [madeUp]) to make 20.
  */
 class HardcodedWeeklyDeals : WeeklyDealsRepository {
 
@@ -52,7 +53,7 @@ class HardcodedWeeklyDeals : WeeklyDealsRepository {
         // Deal labels. Delhaize prints "gratis" in its French folder too.
         fun free(deal: String, fr: String = "gratuit") = t("$deal free", "$deal $fr", "$deal gratis")
         fun delhaizeSecondAt(percent: String) = t("2nd at $percent", "2e à $percent", "2de tegen $percent")
-        val VARIABLE_WEIGHT = t("Variable weight", "Poids variable", "Variabel gewicht")
+        val SECOND_TRAY_HALF_PRICE = t("2nd tray at -50%", "2e ravier à -50%", "2de schaal tegen -50%")
 
         // Declared before DEALS, which reads it while the companion is initialised.
         /** Made-up staples that pad a store's list to 20 where the folder sites showed fewer. */
@@ -81,35 +82,37 @@ class HardcodedWeeklyDeals : WeeklyDealsRepository {
         // product (the last argument, where it is an everyday product we have a photo of).
         // The label is the deal as the source printed it, or null when it gave only prices.
         val DEALS: Map<String, List<WeeklyDeal>> = mapOf(
-            // From Delhaize's own folders for week 40 (01/10 to 07/10/2026), French and Dutch as
+            // From Delhaize's own folders for week 42 (15/10 to 21/10/2026), French and Dutch as
             // printed. Every Delhaize promo needs a SuperPlus card, registered or not. Prices, and
             // the original prices next to them, are for the quantity in the folder's example,
-            // hence the unit; the folder prints no original price for some.
+            // hence the unit.
             "delhaize" to deals(
                 "delhaize",
                 listOf(
-                    deal(VEGETABLES, t("Belgian endives", "Chicons", "Witloof"), null, same("650 g"), free("1+1", fr = "gratis"), null, card = true, until = "07/10", product = GenericProduct.ENDIVES),
-                    deal(VEGETABLES, t("Veggie or organic veggie product", "Produit veggie ou veggie bio", "Veggie of bioveggie product"), "Delhaize", t("150 g to 500 g", "150 g à 500 g", "Van 150 g tot 500 g"), free("1+1", fr = "gratis"), 3.09, "/2", was = 6.18, card = true, until = "07/10"),
-                    deal(EGGS, t("Free-range eggs", "Œufs de poules élevées en plein air", "Eieren van hennen met vrije uitloop"), null, t("6 eggs", "6 pièces", "6 stuks"), delhaizeSecondAt("-50%"), 3.23, "/2", was = 4.30, card = true, until = "07/10", product = GenericProduct.EGGS),
-                    deal(FISH, t("Jumbo mussels", "Moules jumbo", "Jumbo mosselen"), null, t("1 kg or 2 kg", "1 kg ou 2 kg", "1 kg of 2 kg"), delhaizeSecondAt("-50%"), 11.97, "/2", was = 15.96, card = true, until = "07/10", product = GenericProduct.MUSSELS),
-                    deal(POULTRY, t("Chicken tenderloins", "Aiguillettes de poulet", "Kippenhaasjes"), null, VARIABLE_WEIGHT, delhaizeSecondAt("-50%"), 9.67, "/kg", was = 12.89, card = true, until = "07/10", product = GenericProduct.CHICKEN_BREAST),
-                    deal(MEAT, t("Beef: chateaubriand, sirloin or rump steak", "Viande de boeuf: châteaubriand, contrefilet ou rumsteak", "Rundvlees: chateaubriand, dunne lende of rumsteak"), null, VARIABLE_WEIGHT, same("-20%"), 19.99, "/kg", was = 24.99, card = true, until = "07/10", product = GenericProduct.BEEF_STEAK),
-                    deal(FISH, t("Cod loin", "Dos de cabillaud", "Kabeljauwhaasje"), null, VARIABLE_WEIGHT, delhaizeSecondAt("-40%"), 31.99, "/kg", was = 39.99, card = true, until = "07/10", product = GenericProduct.COD),
-                    deal(MEAT, t("Cold cuts", "Charcuterie", "Fijne vleeswaren"), "Breydel", t("150 g, 300 g or variable weight", "150 g, 300 g ou poids variable", "150 g, 300 g of variabel gewicht"), delhaizeSecondAt("-50%"), 6.59, "/2", was = 8.78, card = true, until = "07/10", product = GenericProduct.HAM),
-                    deal(CHEESE, t("Cheese", "Fromage", "Kaas"), "Oudendijk", t("180 g, 250 g or variable weight", "180 g, 250 g ou poids variable", "180 g, 250 g of variabel gewicht"), delhaizeSecondAt("-50%"), 6.74, "/2", was = 8.98, card = true, until = "07/10", product = GenericProduct.CHEESE),
-                    deal(DAIRY, t("Butter or cooking cream", "Beurre ou crème culinaire", "Boter of culinaire room"), "Carlsbourg", t("200 g to 250 g, 200 ml or 250 ml", "200 g à 250 g, 200 ml ou 250 ml", "Van 200 g tot 250 g, 200 ml of 250 ml"), delhaizeSecondAt("-50%"), 3.68, "/2", was = 4.90, card = true, until = "07/10", product = GenericProduct.BUTTER),
-                    deal(PASTA, t("Pasta", "Pâtes", "Pasta"), "Panzani", same("500 g"), delhaizeSecondAt("-50%"), 3.29, "/2", was = 4.38, card = true, until = "07/10", product = GenericProduct.PASTA),
-                    deal(CANNED, t("Canned vegetables", "Légumes en conserve", "Groenten in blik"), "Bonduelle", t("255 g to 800 g", "255 g à 800 g", "Van 255 g tot 800 g"), free("1+1", fr = "gratis"), 2.49, "/2", was = 4.98, card = true, until = "07/10", product = GenericProduct.CANNED_FOOD),
-                    deal(FROZEN, same("Pizza Holy Slice"), "Iglo", t("327 g to 570 g", "327 g à 570 g", "Van 327 g tot 570 g"), free("1+1", fr = "gratis"), 5.49, "/2", was = 10.98, card = true, until = "07/10", product = GenericProduct.PIZZA),
-                    deal(FROZEN, t("Specialty fries or roast potatoes", "Frites spéciales ou patates rissolées", "Speciale frieten of gebakken aardappelen"), "Belviva", t("600 g or 750 g", "600 g ou 750 g", "600 g of 750 g"), free("1+1", fr = "gratis"), 4.49, "/2", was = 8.98, card = true, until = "07/10", product = GenericProduct.FRIES),
-                    deal(COFFEE_TEA, t("Coffee beans or ground coffee", "Café en grains ou moulu", "Koffie, in bonen of gemalen"), "Lavazza", t("250 g to 1 kg", "250 g à 1 kg", "Van 250 g tot 1 kg"), delhaizeSecondAt("-70%"), 10.39, "/2", was = 15.98, card = true, until = "07/10", product = GenericProduct.COFFEE_BEANS),
-                    deal(SOFT_DRINKS, t("Coca-Cola Original or Zero", "Coca-Cola Original ou Zero", "Coca-Cola Original of Zero"), "Coca-Cola", t("12 x 37.5 cl", "12 x 37,5 cl", "12 x 37,5 cl"), free("9+3", fr = "gratis"), 11.70, "/promopack", card = true, until = "07/10", product = GenericProduct.SOFT_DRINK_CANS),
-                    deal(WINE, t("Over 250 wines and sparkling wines", "Plus de 250 vins et bulles", "250 wijnen en bubbels"), null, same("75 cl"), free("2+1", fr = "gratis"), null, card = true, until = "21/10", product = GenericProduct.RED_WINE),
-                    deal(LAUNDRY, t("Laundry detergent or stain remover", "Produit pour la lessive ou détachant", "Wasmiddel of vlekverwijderaar"), "Dash", t("15 to 80 doses", "15 à 80 doses", "Van 15 doses tot 80 doses"), free("1+1", fr = "gratis"), 22.99, "/2", was = 45.98, card = true, until = "14/10", product = GenericProduct.LAUNDRY_DETERGENT),
-                    deal(PAPER, t("Moltonel toilet paper", "Papier toilette Moltonel", "Toiletpapier Moltonel"), "Lotus", t("18 rolls", "18 rouleaux", "18 rollen"), free("12+6", fr = "gratis"), 9.32, "/promopack", card = true, until = "14/10", product = GenericProduct.TOILET_PAPER),
-                    deal(BABY, t("Skin Love nappies", "Langes Skin Love", "Luiers Skin Love"), "Pampers", t("23 to 29 nappies", "23 à 29 pièces", "Van 23 tot 29 stuks"), same("-50%"), 8.00, was = 15.99, card = true, until = "07/10"),
-                    deal(SWEETS, same("Donut Worry Be Happy"), null, t("Each", "Pièce", "Stuk"), free("3+3", fr = "gratis"), 3.75, "/6", was = 7.50, card = true, until = "07/10", product = GenericProduct.DONUTS),
-                    deal(DAIRY, t("Apple and cinnamon yoghurt", "Yaourt pomme/cannelle", "Yoghurt appel/kaneel"), "Delhaize", same("180 g"), delhaizeSecondAt("-50%"), 1.43, "/2", was = 1.90, card = true, until = "07/10", product = GenericProduct.YOGHURT),
+                    deal(POULTRY, t("Diced chicken fillet", "Dés de filet de poulet", "Kipfiletblokjes"), "Delhaize", null, t("1+1 tray free", "1+1 ravier gratis", "1+1 schaal gratis"), 7.00, "/kg", was = 13.99, card = true, until = "21/10", product = GenericProduct.CHICKEN_BREAST),
+                    deal(CHEESE, t("Cheese spread or sliced cheese", "Fromage en crème ou en tranches", "Kaascrème of kaas in sneden"), "Old Amsterdam", t("125 g or 150 g", "125 g ou 150 g", "125 g of 150 g"), free("1+1", fr = "gratis"), 3.15, "/2", was = 6.30, card = true, until = "21/10", product = GenericProduct.CHEESE),
+                    deal(PASTA, t("Pasta", "Pâtes", "Pasta"), "La Molisana", same("500 g"), free("1+1", fr = "gratis"), 2.15, "/2", was = 4.30, card = true, until = "21/10", product = GenericProduct.PASTA),
+                    deal(COFFEE_TEA, t("Ground coffee or pads", "Café moulu ou en pads", "Koffie, gemalen of in pads"), "Perla", t("250 g or 36 pads", "250 g ou 36 pads", "250 g of 36 pads"), free("1+1", fr = "gratis"), 4.99, "/2", was = 9.98, card = true, until = "21/10", product = GenericProduct.GROUND_COFFEE),
+                    deal(DAIRY, t("Kefir", "Kéfir", "Kefir"), "Activia", t("4 x 125 g to 345 g, 280 ml or 500 ml", "De 4 x 125 g à 345 g, 280 ml ou 500 ml", "Van 4 x 125 g tot 345 g, 280 ml of 500 ml"), free("1+1", fr = "gratis"), 2.49, "/2", was = 4.98, card = true, until = "21/10", product = GenericProduct.YOGHURT),
+                    deal(VEGETABLES, t("Hesbaye carrots", "Carottes de Hesbaye", "Haspengouwse wortelen"), "Delhaize", same("1 kg"), delhaizeSecondAt("-50%"), 2.24, "/2", was = 2.98, card = true, until = "21/10", product = GenericProduct.CARROTS),
+                    deal(VEGETABLES, t("Trimmed Brussels sprouts", "Choux de Bruxelles nettoyés", "Geschoonde spruiten"), "Delhaize", same("500 g"), delhaizeSecondAt("-50%"), 3.74, "/2", was = 4.98, card = true, until = "21/10", product = GenericProduct.BRUSSELS_SPROUTS),
+                    deal(EGGS, t("Eggs (except organic)", "Œufs (sauf bio)", "Eieren (behalve bio)"), "Columbus", t("4 or 6 eggs", "4 pièces ou 6 pièces", "4 stuks of 6 stuks"), delhaizeSecondAt("-50%"), 4.73, "/2", was = 6.30, card = true, until = "21/10", product = GenericProduct.EGGS),
+                    deal(FROZEN, t("Fish & chips or fish & fun", "Fish & chips ou fish & fun", "Fish & chips of fish & fun"), "Iglo", t("240 g to 352 g", "De 240 g à 352 g", "Van 240 g tot 352 g"), free("1+1", fr = "gratis"), 5.19, "/2", was = 10.38, card = true, until = "21/10", product = GenericProduct.FISH_FINGERS),
+                    deal(PAPER, t("Moltonel Style toilet paper", "Papier toilette Moltonel style", "Toiletpapier Moltonel style"), "Lotus", t("18 rolls", "18 rouleaux", "18 rollen"), free("9+9", fr = "gratis"), 6.99, "/promopack", card = true, until = "21/10", product = GenericProduct.TOILET_PAPER),
+                    deal(FISH, t("Scottish smoked salmon", "Saumon fumé d’Écosse", "Schotse gerookte zalm"), "Delhaize", same("130 g"), delhaizeSecondAt("-50%"), 11.39, "/2", was = 15.18, card = true, until = "21/10", product = GenericProduct.SALMON),
+                    deal(MEAT, t("Pork or farmhouse chipolata", "Chipolata de porc ou de campagne", "Varkens- of boerenchipolata"), "Delhaize", t("180 g to 960 g or variable weight", "De 180 g à 960 g ou poids variable", "Van 180 g tot 960 g of variabel gewicht"), SECOND_TRAY_HALF_PRICE, 4.04, "/2", was = 5.38, card = true, until = "21/10", product = GenericProduct.SAUSAGES),
+                    deal(FROZEN, t("Frozen vegetables", "Légumes surgelés", "Diepgevroren groenten"), "Marie Thumas", null, free("1+1", fr = "gratis"), 4.49, "/2", was = 8.98, card = true, until = "21/10"),
+                    deal(SOFT_DRINKS, t("Fruit juice", "Jus de fruits", "Vruchtensap"), "Tropicana", t("900 ml or 1.5 L", "900 ml ou 1,5 L", "900 ml of 1,5 L"), delhaizeSecondAt("-50%"), 5.99, "/2", was = 7.98, card = true, until = "21/10", product = GenericProduct.ORANGE_JUICE),
+                    deal(CHEESE, t("Raclette or fondue cheese", "Fromage pour raclette ou fondue", "Kaas voor raclette of fondue"), "Delhaize", t("180 g to 550 g", "De 180 g à 550 g", "Van 180 g tot 550 g"), free("3+1", fr = "gratis"), 12.87, "/4", was = 17.16, card = true, until = "21/10", product = GenericProduct.CHEESE),
+                    deal(POULTRY, t("Chipolata, burger, merguez, sausages, roll or strips", "Chipolata, burger, merguez, saucisses, roulade ou émincés", "Chipolata, burger, merguez, worsten, rollade of reepjes"), "Coq Ardenne", null, delhaizeSecondAt("-50%"), 15.74, "/kg", was = 20.99, card = true, until = "21/10"),
+                    deal(PASTA, t("Ready-to-heat rice pouch", "Riz prêt à réchauffer en sachet", "Rijst om op te warmen in zakje"), "Ben’s Original", same("220 g"), free("2+2", fr = "gratis"), 4.70, "/4", was = 9.40, card = true, until = "21/10", product = GenericProduct.RICE),
+                    deal(COFFEE_TEA, t("Coffee capsules", "Café en capsules", "Koffiecapsules"), "L’Or", same("10 capsules"), free("2+2", fr = "gratis"), 9.18, "/4", was = 18.36, card = true, until = "21/10", product = GenericProduct.COFFEE_CAPSULES),
+                    deal(CANNED, t("Olive oil", "Huile d’olive", "Olijfolie"), "Filippo Berio", t("200 ml to 3 L", "De 200 ml à 3 L", "Van 200 ml tot 3 L"), delhaizeSecondAt("-50%"), 11.99, "/2", was = 15.98, card = true, until = "21/10", product = GenericProduct.OLIVE_OIL),
+                    deal(CANNED, t("Tomato sauce", "Sauce tomate", "Tomatensaus"), "Mutti", t("130 g to 2 x 400 g", "De 130 g à 2 x 400 g", "Van 130 g tot 2 x 400 g"), delhaizeSecondAt("-50%"), 4.58, "/2", was = 6.10, card = true, until = "21/10", product = GenericProduct.CANNED_FOOD),
+                    deal(SOFT_DRINKS, t("Zero sugar sparkling drink", "Boisson pétillante Zero sugar", "Bruisende drank Zero sugar"), "Pepsi", same("4 x 1 L"), free("1+1", fr = "gratis"), 6.99, "/2", was = 13.98, card = true, until = "21/10"),
+                    deal(FROZEN, t("Snack & Share chicken snack", "Snack & Share - Snack au poulet", "Snack & Share - Snack met kip"), "Iglo", t("220 g to 375 g", "De 220 g à 375 g", "Van 220 g tot 375 g"), free("1+1", fr = "gratis"), 5.35, "/2", was = 10.70, card = true, until = "21/10"),
+                    deal(DAIRY, t("Margarine or drinking yoghurt", "Margarine ou yaourt à boire", "Margarine of drinkyoghurt"), "Benecol", t("225 g to 8 x 67.5 g", "De 225 g à 8 x 67,5 g", "Van 225 g tot 8 x 67,5 g"), free("1+1", fr = "gratis"), 4.65, "/2", was = 9.30, card = true, until = "21/10", product = GenericProduct.BUTTER),
+                    deal(WATER, t("Intense sparkling natural mineral water", "Eau minérale naturelle pétillante Intense", "Bruisend natuurlijk mineraalwater Intense"), "Spa", t("6 x 1.5 L", "6 x 1,5 L", "6 x 1,5 L"), delhaizeSecondAt("-40%"), 10.06, "/2", was = 12.58, card = true, until = "21/10", product = GenericProduct.WATER),
                 ),
             ),
             // From ALDI's own offers page (aldi.be/aanbiedingen and /offres) on 4 October 2026, French
@@ -145,18 +148,8 @@ class HardcodedWeeklyDeals : WeeklyDealsRepository {
                     deal(VEGETABLES, t("Butternut squash", "Courge butternut", "Butternutpompoen"), null, t("Per kg", "Le kg", "Per kg"), same("-20%"), 1.50, "/kg", was = 1.89, until = "10/10", product = GenericProduct.SQUASH),
                 ),
             ),
-            // Week 40 folder (28/09 to 03/10) and week 41 folder (05/10 to 10/10).
-            "lidl" to deals(
-                "lidl",
-                listOf(
-                    deal(POULTRY, t("Chicken breast fillet XXL", "Filet de poulet XXL", "Kipfilet XXL"), null, t("1.5 kg", "1,5 kg", "1,5 kg"), same("-31%"), 9.99, until = "03/10", product = GenericProduct.CHICKEN_BREAST),
-                    deal(SOFT_DRINKS, t("Energy drink", "Boisson énergisante", "Energiedrank"), "Red Bull", same("2 x 6 x 25 cl"), t("2nd at -50%", "2e à -50%", "2de aan -50%"), 7.49, until = "10/10", product = GenericProduct.SOFT_DRINK_CANS),
-                    deal(SOFT_DRINKS, t("Lemonade", "Limonade", "Limonade"), "Schweppes", same("2 x 6 x 50 cl"), null, null, until = "10/10", product = GenericProduct.LEMONADE),
-                    deal(SOFT_DRINKS, t("Energy drink", "Boisson énergisante", "Energiedrank"), "Monster", t("3 x 55.3 cl", "3 x 55,3 cl", "3 x 55,3 cl"), null, 3.00, until = "03/10", product = GenericProduct.SOFT_DRINK_CANS),
-                    deal(LAUNDRY, t("Laundry detergent or softener", "Lessive ou adoucissant", "Wasmiddel of wasverzachter"), "Dreft", t("2 x 32 washes", "2 x 32 lavages", "2 x 32 wasbeurten"), null, 5.69, until = "03/10", product = GenericProduct.LAUNDRY_DETERGENT),
-                    deal(LAUNDRY, t("Liquid laundry detergent", "Lessive liquide", "Vloeibaar wasmiddel"), "Ariel", t("2 x 25 washes", "2 x 25 lavages", "2 x 25 wasbeurten"), null, 22.99, until = "10/10", product = GenericProduct.LAUNDRY_DETERGENT),
-                ) + madeUp(14, except = setOf("Chicken breast fillets")),
-            ),
+            // Written by tools/lidl_deals.py from lidl.be; run it again for a new week.
+            "lidl" to deals("lidl", LIDL_WEEKLY_DEALS),
             // Loyalty card offers valid through October.
             "intermarche" to deals(
                 "intermarche",
