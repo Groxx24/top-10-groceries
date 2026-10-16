@@ -26,3 +26,6 @@ google-services.json
 # OS and logs
 .DS_Store
 *.log
+
+# Signed bundles Android Studio writes on "Generate Signed App Bundle"
+/app/release/
